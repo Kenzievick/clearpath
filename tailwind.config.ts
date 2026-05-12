@@ -29,10 +29,17 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
+        display: ['"Playfair Display"', "Georgia", "serif"],
       },
       fontSize: {
-        "hero": ["64px", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "800" }],
-        "section": ["40px", { lineHeight: "1.2", letterSpacing: "-0.015em", fontWeight: "700" }],
+        hero: [
+          "64px",
+          { lineHeight: "1.05", letterSpacing: "-0.02em", fontWeight: "800" },
+        ],
+        section: [
+          "40px",
+          { lineHeight: "1.2", letterSpacing: "-0.015em", fontWeight: "700" },
+        ],
       },
     },
   },
