@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,7 +6,11 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #1c1917;
+  --foreground: #0F1117;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -14,12 +18,7 @@ body {
   color: var(--foreground);
   font-family: 'Inter', system-ui, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
-}
-
-@layer base {
-  h1, h2, h3, h4, h5, h6 {
-    letter-spacing: -0.02em;
-  }
+  -moz-osx-font-smoothing: grayscale;
 }
 
 @layer utilities {

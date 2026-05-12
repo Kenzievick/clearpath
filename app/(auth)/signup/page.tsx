@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
-import Button from "@/components/ui/Button";
-import Input from "@/components/ui/Input";
 import { createClient } from "@/lib/supabase/client";
 
 export default function SignupPage() {
@@ -25,7 +24,6 @@ export default function SignupPage() {
     }
 
     setLoading(true);
-
     const supabase = createClient();
     const { error: authError } = await supabase.auth.signUp({
       email,
@@ -46,81 +44,132 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
-      <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <Logo size="lg" />
+    <div className="min-h-screen flex">
+      {/* ── Left panel (desktop only) ── */}
+      <div className="hidden md:flex md:w-1/2 relative bg-[#0F1117] flex-col">
+        <Image
+          src="https://picsum.photos/seed/clearpath-auth-signup/600/900"
+          alt="A parent advocating for their child"
+          fill
+          className="object-cover opacity-60"
+          unoptimized
+          priority
+        />
+        {/* Dark gradient overlay at bottom */}
+        <div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(to bottom, rgba(15,17,23,0.2) 0%, rgba(15,17,23,0.85) 100%)",
+          }}
+        />
+        {/* Quote */}
+        <div className="relative mt-auto p-12">
+          <svg className="w-10 h-10 text-[#2D9B83] mb-4 opacity-60" fill="currentColor" viewBox="0 0 32 32">
+            <path d="M10 8C5.6 8 2 11.6 2 16s3.6 8 8 8c1.4 0 2.7-.4 3.8-1-.3 1.7-1.1 3.2-2.3 4.4l1.4 1.4C15.1 26.6 16 23.4 16 20V8h-6zm16 0c-4.4 0-8 3.6-8 8s3.6 8 8 8c1.4 0 2.7-.4 3.8-1-.3 1.7-1.1 3.2-2.3 4.4l1.4 1.4C31.1 26.6 32 23.4 32 20V8h-6z" />
+          </svg>
+          <blockquote className="text-white text-xl font-medium leading-relaxed mb-5">
+            I finally understood what my daughter&apos;s scores meant. I walked
+            into that meeting knowing exactly what to ask for.
+          </blockquote>
+          <cite className="text-[#9CA3AF] text-sm not-italic">
+            — Parent, Connecticut
+          </cite>
         </div>
+      </div>
 
-        {/* Card */}
-        <div className="bg-white rounded-2xl shadow-sm border border-stone-100 p-8">
-          <div className="mb-7">
-            <h1 className="text-2xl font-semibold text-stone-900 mb-2">
-              Let&apos;s get you ready for the meeting.
-            </h1>
-            <p className="text-stone-500 text-sm">
-              Create your free account to upload your child&apos;s evaluation
-              report and get your plain-English brief.
-            </p>
+      {/* ── Right panel: form ── */}
+      <div className="w-full md:w-1/2 flex flex-col items-center justify-center px-8 py-16 bg-white">
+        <div className="w-full max-w-sm">
+          <div className="mb-8">
+            <Logo size="md" variant="light" />
           </div>
 
+          <h1 className="text-3xl font-bold text-[#0F1117] mb-2" style={{ letterSpacing: "-0.02em" }}>
+            Let&apos;s get you ready for the meeting.
+          </h1>
+          <p className="text-[#6B7280] text-base mb-8">
+            Create your free account and upload your child&apos;s evaluation
+            report.
+          </p>
+
           {error && (
-            <div className="mb-5 p-4 bg-red-50 border border-red-200 rounded-xl">
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
               <p className="text-sm text-red-700">{error}</p>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <Input
-              id="email"
-              label="Email address"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-            />
-
-            <Input
-              id="password"
-              label="Password"
-              type="password"
-              placeholder="At least 8 characters"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="new-password"
-            />
-
-            <div className="pt-2">
-              <Button
-                type="submit"
-                fullWidth
-                size="lg"
-                loading={loading}
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-[#374151] mb-1.5"
               >
-                {loading ? "Creating your account…" : "Create free account"}
-              </Button>
+                Email address
+              </label>
+              <input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+                className="w-full px-4 py-3 rounded-xl border border-[#E5E7EB] text-[#0F1117] placeholder-[#9CA3AF] text-base transition-colors focus:outline-none focus:ring-2 focus:ring-[#2D9B83]/40 focus:border-[#2D9B83] hover:border-[#D1D5DB]"
+              />
             </div>
+
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-[#374151] mb-1.5"
+              >
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                placeholder="At least 8 characters"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="new-password"
+                className="w-full px-4 py-3 rounded-xl border border-[#E5E7EB] text-[#0F1117] placeholder-[#9CA3AF] text-base transition-colors focus:outline-none focus:ring-2 focus:ring-[#2D9B83]/40 focus:border-[#2D9B83] hover:border-[#D1D5DB]"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-[#2D9B83] hover:bg-[#238A72] disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl text-base transition-colors flex items-center justify-center gap-2 mt-2"
+            >
+              {loading ? (
+                <>
+                  <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                  </svg>
+                  Creating your account…
+                </>
+              ) : (
+                "Create free account"
+              )}
+            </button>
           </form>
 
-          <p className="text-xs text-stone-400 mt-5 text-center leading-relaxed">
-            By creating an account, you agree to our Terms of Service and
-            Privacy Policy.
+          <p className="text-xs text-[#9CA3AF] text-center mt-5 leading-relaxed">
+            By creating an account you agree to our Terms of Service and Privacy
+            Policy.
+          </p>
+
+          <p className="text-center text-sm text-[#6B7280] mt-5">
+            Already have an account?{" "}
+            <Link href="/login" className="text-[#2D9B83] font-medium hover:underline">
+              Log in.
+            </Link>
           </p>
         </div>
-
-        <p className="text-center text-sm text-stone-500 mt-6">
-          Already have an account?{" "}
-          <Link
-            href="/login"
-            className="text-blue-600 font-medium hover:underline"
-          >
-            Log in.
-          </Link>
-        </p>
       </div>
     </div>
   );

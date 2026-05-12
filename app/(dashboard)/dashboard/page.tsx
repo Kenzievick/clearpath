@@ -38,7 +38,7 @@ export default async function DashboardPage() {
         <div className="mb-12">
           <h1 className="text-3xl font-semibold text-stone-900 mb-2">
             You&apos;re in the right place,{" "}
-            <span className="text-blue-600">{displayName}.</span>
+            <span className="text-[#2D9B83]">{displayName}.</span>
           </h1>
           <p className="text-stone-500 text-lg">
             Let&apos;s get your child&apos;s meeting brief ready.
@@ -48,9 +48,9 @@ export default async function DashboardPage() {
         {/* Upload card */}
         <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-10 max-w-xl">
           <div className="flex items-start gap-5 mb-6">
-            <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
+            <div className="w-12 h-12 rounded-xl bg-[#E8F5F2] flex items-center justify-center flex-shrink-0">
               <svg
-                className="w-6 h-6 text-blue-600"
+                className="w-6 h-6 text-[#2D9B83]"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -77,7 +77,7 @@ export default async function DashboardPage() {
 
           <button
             disabled
-            className="w-full bg-blue-600 text-white font-medium py-3.5 rounded-xl opacity-70 cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-[#2D9B83] text-white font-medium py-3.5 rounded-xl opacity-60 cursor-not-allowed flex items-center justify-center gap-2"
             title="Coming soon — will be wired up in a future step"
           >
             <svg
