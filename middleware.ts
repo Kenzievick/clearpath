@@ -1,7 +1,15 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+// Public routes that must never be touched by auth handling. Stripe webhooks
+// arrive with no user session and must pass straight through.
+const PUBLIC_ROUTES = ['/api/webhooks/stripe']
+
 export async function middleware(request: NextRequest) {
+  if (PUBLIC_ROUTES.some((p) => request.nextUrl.pathname.startsWith(p))) {
+    return NextResponse.next({ request })
+  }
+
   let supabaseResponse = NextResponse.next({ request })
 
   const supabase = createServerClient(

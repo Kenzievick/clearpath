@@ -17,12 +17,14 @@ export default function Logo({
     lg: "text-3xl",
   };
 
-  const pathColor = variant === "dark" ? "text-white" : "text-[#0F1117]";
+  const isDark = variant === "dark";
+  const clearColor = isDark ? "text-white" : "text-[#1B3A6B]";
+  const pathColor = isDark ? "text-white" : "text-[#0B0E0D]";
 
   const content = (
-    <span className={`font-semibold tracking-tight ${sizes[size]}`}>
-      <span className="text-[#2D9B83]">Clear</span>
-      <span className={pathColor}>path</span>
+    <span className={`font-bold tracking-tight ${sizes[size]}`}>
+      <span className={`${clearColor} font-bold`}>Clear</span>
+      <span className={`${pathColor} font-bold`}>path</span>
     </span>
   );
 

@@ -12,9 +12,17 @@ const config: Config = {
         background: "var(--background)",
         foreground: "var(--foreground)",
         primary: {
-          DEFAULT: "#2D9B83",
-          hover: "#238A72",
-          subtle: "#E8F5F2",
+          DEFAULT: "#1B3A6B",
+          hover: "#152D54",
+          subtle: "#EEF2F9",
+        },
+        navy: {
+          50: "#EEF2F9",
+          100: "#D4DEEF",
+          500: "#2B5BA8",
+          600: "#1B3A6B",
+          700: "#152D54",
+          900: "#0B1929",
         },
         ink: {
           DEFAULT: "#0F1117",

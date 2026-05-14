@@ -15,8 +15,8 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`sticky top-0 z-50 bg-[#0F1117] transition-all duration-300 ${
-        scrolled ? "border-b border-white/10 shadow-xl shadow-black/30" : ""
+      className={`sticky top-0 z-50 bg-[#0B0E0D] transition-all duration-300 ${
+        scrolled ? "border-b border-white/10" : ""
       }`}
     >
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -24,15 +24,15 @@ export default function Navbar() {
         <div className="flex items-center gap-6">
           <Link
             href="/login"
-            className="text-[#9CA3AF] hover:text-white text-sm font-medium transition-colors"
+            className="text-[#A8B0AC] hover:text-white text-sm font-medium transition-colors"
           >
             Log in
           </Link>
           <Link
             href="/signup"
-            className="bg-[#2D9B83] hover:bg-[#238A72] text-white text-sm font-semibold px-5 py-2 rounded-full transition-colors"
+            className="btn-press bg-[#1B3A6B] hover:bg-[#152D54] text-white text-sm font-semibold px-5 py-2 rounded-full transition-colors"
           >
-            Get started free
+            Translate my report
           </Link>
         </div>
       </div>

@@ -1,5 +1,38 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import Logo from "@/components/Logo";
+import { getUserBriefs, getUserChildren } from "@/lib/data/briefs";
+import { PageHeader, Card, LinkButton, StatusBadge, NAVY, INK, MUTED } from "@/components/dashboard/ui";
+import { UpgradeButton } from "@/components/SubscriptionButtons";
+
+function greeting() {
+  const h = new Date().getHours();
+  if (h < 12) return "Good morning";
+  if (h < 18) return "Good afternoon";
+  return "Good evening";
+}
+
+function formatDate(d: string) {
+  return new Date(d).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+type Child = {
+  id: string;
+  first_name: string;
+  grade: string | null;
+  state: string | null;
+};
+
+type Brief = {
+  id: string;
+  status: string | null;
+  created_at: string;
+  child_id: string;
+  children?: { first_name: string } | null;
+};
 
 export default async function DashboardPage() {
   const supabase = createClient();
@@ -7,100 +40,169 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // The (dashboard) layout already redirects unauthenticated users; this is a
+  // type guard so the parallel fetch below can rely on `user`.
+  if (!user) return null;
+
   const displayName =
-    user?.user_metadata?.first_name || user?.email?.split("@")[0] || "there";
+    user.user_metadata?.first_name || user.email?.split("@")[0] || "there";
+
+  // Fetch children, all briefs, and subscription status in parallel rather
+  // than sequentially. One briefs query now serves both the "Recent Briefs"
+  // list (sliced) and the per-child counts — eliminating a redundant query.
+  const [childrenData, allBriefs, profileRes] = await Promise.all([
+    getUserChildren(user.id),
+    getUserBriefs(user.id),
+    supabase
+      .from("profiles")
+      .select("subscription_status")
+      .eq("id", user.id)
+      .single(),
+  ]);
+
+  const children: Child[] = (childrenData as unknown as Child[]) ?? [];
+  const allBriefsTyped = (allBriefs as unknown as Brief[]) ?? [];
+  const briefs: Brief[] = allBriefsTyped.slice(0, 5);
+
+  const briefCountByChild = new Map<string, number>();
+  allBriefsTyped.forEach((b) => {
+    if (!b.child_id) return;
+    briefCountByChild.set(b.child_id, (briefCountByChild.get(b.child_id) ?? 0) + 1);
+  });
+
+  // Upgrade prompt: only for free users who have already generated a brief.
+  const profile = profileRes.data as { subscription_status?: string } | null;
+  const isSubscribed = profile?.subscription_status === "active";
+  const showUpgradePrompt = !isSubscribed && allBriefsTyped.length > 0;
 
   return (
-    <div className="min-h-screen bg-stone-50">
-      {/* Top nav */}
-      <nav className="bg-white border-b border-stone-100 px-6 py-4">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <Logo size="md" linkTo="/dashboard" />
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-stone-500 hidden sm:block">
-              {user?.email}
-            </span>
-            <form action="/api/auth/signout" method="post">
-              <button
-                type="submit"
-                className="text-sm text-stone-500 hover:text-stone-800 font-medium transition-colors"
-              >
-                Sign out
-              </button>
-            </form>
-          </div>
-        </div>
-      </nav>
+    <>
+      <PageHeader
+        title={`${greeting()}, ${displayName}.`}
+        subtitle="Here is where things stand for your children."
+      />
 
-      {/* Main */}
-      <main className="max-w-5xl mx-auto px-6 py-14">
-        {/* Welcome */}
-        <div className="mb-12">
-          <h1 className="text-3xl font-semibold text-stone-900 mb-2">
-            You&apos;re in the right place,{" "}
-            <span className="text-[#2D9B83]">{displayName}.</span>
-          </h1>
-          <p className="text-stone-500 text-lg">
-            Let&apos;s get your child&apos;s meeting brief ready.
+      {showUpgradePrompt && (
+        <div
+          className="rounded-xl mb-8 flex items-center justify-between gap-4 flex-wrap"
+          style={{
+            background: "#EEF2F9",
+            borderLeft: `4px solid ${NAVY}`,
+            padding: "16px 20px",
+          }}
+        >
+          <p style={{ color: INK, fontSize: "14px", lineHeight: 1.55, maxWidth: "560px" }}>
+            You&apos;re on the free plan. Upgrade to unlock your child&apos;s
+            complete brief, accommodations, meeting questions, and chat.
           </p>
+          <UpgradeButton label="Upgrade — $27/month" />
         </div>
+      )}
 
-        {/* Upload card */}
-        <div className="bg-white rounded-2xl border border-stone-100 shadow-sm p-10 max-w-xl">
-          <div className="flex items-start gap-5 mb-6">
-            <div className="w-12 h-12 rounded-xl bg-[#E8F5F2] flex items-center justify-center flex-shrink-0">
-              <svg
-                className="w-6 h-6 text-[#2D9B83]"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={1.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
+      {children.length === 0 ? (
+        <Card className="max-w-2xl mx-auto text-center">
+          <div className="py-8">
+            <div
+              className="mx-auto mb-6 rounded-2xl flex items-center justify-center"
+              style={{ width: "72px", height: "72px", background: "#EEF2F9" }}
+            >
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={NAVY} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <path d="M22 11h-6M19 8v6" />
               </svg>
             </div>
-            <div>
-              <h2 className="text-xl font-semibold text-stone-900 mb-1">
-                Upload Your Child&apos;s Report
-              </h2>
-              <p className="text-stone-500 text-sm leading-relaxed">
-                Once you upload your child&apos;s evaluation report, Clearpath
-                will read it and build your personalized meeting brief. It takes
-                about 3 to 5 minutes.
-              </p>
-            </div>
+            <h2 className="font-bold mb-3" style={{ color: INK, fontSize: "22px" }}>
+              Start by adding your child.
+            </h2>
+            <p className="mb-6 mx-auto" style={{ color: MUTED, fontSize: "15px", maxWidth: "420px", lineHeight: 1.6 }}>
+              Create a profile for your child so Clearpath can personalize every
+              brief to their specific situation.
+            </p>
+            <LinkButton href="/dashboard/children/new">Add Your First Child</LinkButton>
           </div>
+        </Card>
+      ) : (
+        <>
+          <h2 className="font-bold mb-4" style={{ color: INK, fontSize: "18px" }}>
+            Your Children
+          </h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-12">
+            {children.map((c) => (
+              <Card key={c.id} className="card-hover">
+                <div className="font-bold mb-1" style={{ color: INK, fontSize: "22px" }}>
+                  {c.first_name}
+                </div>
+                <p className="mb-3" style={{ color: MUTED, fontSize: "13px" }}>
+                  {[c.grade, c.state].filter(Boolean).join(" · ") || "—"}
+                </p>
+                <p className="mb-4" style={{ color: MUTED, fontSize: "13px" }}>
+                  {briefCountByChild.get(c.id) ?? 0} brief
+                  {(briefCountByChild.get(c.id) ?? 0) === 1 ? "" : "s"} generated
+                </p>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <LinkButton href="/dashboard/upload" className="!px-4 !py-2 !text-[13px]">
+                    New Brief
+                  </LinkButton>
+                  <Link
+                    href={`/dashboard/children/${c.id}/edit`}
+                    className="text-sm font-medium hover:underline"
+                    style={{ color: MUTED }}
+                  >
+                    View Profile
+                  </Link>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </>
+      )}
 
-          <button
-            disabled
-            className="w-full bg-[#2D9B83] text-white font-medium py-3.5 rounded-xl opacity-60 cursor-not-allowed flex items-center justify-center gap-2"
-            title="Coming soon — will be wired up in a future step"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
-              />
-            </svg>
-            Upload Report
-          </button>
-
-          <p className="text-xs text-stone-400 text-center mt-3">
-            Report upload coming soon. Check back shortly.
+      <h2 className="font-bold mb-4" style={{ color: INK, fontSize: "18px" }}>
+        Recent Briefs
+      </h2>
+      {briefs.length === 0 ? (
+        <Card>
+          <p style={{ color: MUTED, fontSize: "14px" }}>
+            No briefs yet. Upload an evaluation report to get started.
           </p>
+        </Card>
+      ) : (
+        <div className="space-y-3">
+          {briefs.map((b) => (
+            <Card key={b.id} className="!p-5 card-hover">
+              <div className="flex items-center justify-between gap-4 flex-wrap">
+                <div className="min-w-0">
+                  <div className="font-bold mb-0.5" style={{ color: INK, fontSize: "15px" }}>
+                    {b.children?.first_name ?? "—"}
+                  </div>
+                  <p style={{ color: MUTED, fontSize: "13px" }}>
+                    {formatDate(b.created_at)}
+                  </p>
+                </div>
+                <div className="flex items-center gap-3 flex-wrap">
+                  <StatusBadge status={b.status ?? "processing"} />
+                  <LinkButton href="/dashboard/briefs" className="!px-4 !py-2 !text-[13px]">
+                    View Brief
+                  </LinkButton>
+                  <button
+                    type="button"
+                    className="font-semibold rounded-lg transition-colors"
+                    style={{
+                      border: `1px solid ${NAVY}`,
+                      color: NAVY,
+                      padding: "8px 16px",
+                      fontSize: "13px",
+                    }}
+                  >
+                    Download PDF
+                  </button>
+                </div>
+              </div>
+            </Card>
+          ))}
         </div>
-      </main>
-    </div>
+      )}
+    </>
   );
 }

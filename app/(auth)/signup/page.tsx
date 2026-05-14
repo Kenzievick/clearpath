@@ -46,27 +46,32 @@ export default function SignupPage() {
   return (
     <div className="min-h-screen flex">
       {/* ── Left panel (desktop only) ── */}
-      <div className="hidden md:flex md:w-1/2 relative bg-[#0F1117] flex-col">
-        <Image
-          src="https://picsum.photos/seed/clearpath-auth-signup/600/900"
-          alt="A parent advocating for their child"
-          fill
-          className="object-cover opacity-60"
-          unoptimized
-          priority
-        />
-        {/* Dark gradient overlay at bottom */}
+      <div
+        className="hidden md:flex md:w-1/2 relative bg-[#0F1117] flex-col"
+        style={{ overflow: "hidden", position: "relative" }}
+      >
+        <div className="absolute inset-0 ken-burns">
+          <Image
+            src="https://images.unsplash.com/photo-1476703993599-0035a21b17a9?w=1600&q=90&auto=format&fit=crop"
+            alt="A warm, candid moment between a mother and her child"
+            fill
+            quality={90}
+            priority
+            className="object-cover"
+            style={{ objectPosition: "center top" }}
+          />
+        </div>
         <div
           aria-hidden
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(to bottom, rgba(15,17,23,0.2) 0%, rgba(15,17,23,0.85) 100%)",
+              "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.1) 100%)",
           }}
         />
         {/* Quote */}
         <div className="relative mt-auto p-12">
-          <svg className="w-10 h-10 text-[#2D9B83] mb-4 opacity-60" fill="currentColor" viewBox="0 0 32 32">
+          <svg className="w-10 h-10 text-[#1B3A6B] mb-4 opacity-60" fill="currentColor" viewBox="0 0 32 32">
             <path d="M10 8C5.6 8 2 11.6 2 16s3.6 8 8 8c1.4 0 2.7-.4 3.8-1-.3 1.7-1.1 3.2-2.3 4.4l1.4 1.4C15.1 26.6 16 23.4 16 20V8h-6zm16 0c-4.4 0-8 3.6-8 8s3.6 8 8 8c1.4 0 2.7-.4 3.8-1-.3 1.7-1.1 3.2-2.3 4.4l1.4 1.4C31.1 26.6 32 23.4 32 20V8h-6z" />
           </svg>
           <blockquote className="text-white text-xl font-medium leading-relaxed mb-5">
@@ -80,7 +85,7 @@ export default function SignupPage() {
       </div>
 
       {/* ── Right panel: form ── */}
-      <div className="w-full md:w-1/2 flex flex-col items-center justify-center px-8 py-16 bg-white">
+      <div className="w-full md:w-1/2 flex flex-col items-center justify-center px-8 py-16 bg-white auth-form-enter">
         <div className="w-full max-w-sm">
           <div className="mb-8">
             <Logo size="md" variant="light" />
@@ -116,7 +121,7 @@ export default function SignupPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
-                className="w-full px-4 py-3 rounded-xl border border-[#E5E7EB] text-[#0F1117] placeholder-[#9CA3AF] text-base transition-colors focus:outline-none focus:ring-2 focus:ring-[#2D9B83]/40 focus:border-[#2D9B83] hover:border-[#D1D5DB]"
+                className="w-full px-4 py-3 rounded-xl border border-[#E5E7EB] text-[#0F1117] placeholder-[#9CA3AF] text-base transition-colors focus:outline-none focus:ring-2 focus:ring-[#1B3A6B]/40 focus:border-[#1B3A6B] hover:border-[#D1D5DB]"
               />
             </div>
 
@@ -135,14 +140,14 @@ export default function SignupPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 autoComplete="new-password"
-                className="w-full px-4 py-3 rounded-xl border border-[#E5E7EB] text-[#0F1117] placeholder-[#9CA3AF] text-base transition-colors focus:outline-none focus:ring-2 focus:ring-[#2D9B83]/40 focus:border-[#2D9B83] hover:border-[#D1D5DB]"
+                className="w-full px-4 py-3 rounded-xl border border-[#E5E7EB] text-[#0F1117] placeholder-[#9CA3AF] text-base transition-colors focus:outline-none focus:ring-2 focus:ring-[#1B3A6B]/40 focus:border-[#1B3A6B] hover:border-[#D1D5DB]"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#2D9B83] hover:bg-[#238A72] disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl text-base transition-colors flex items-center justify-center gap-2 mt-2"
+              className="btn-press w-full bg-[#1B3A6B] hover:bg-[#152D54] disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold py-3.5 rounded-xl text-base transition-colors flex items-center justify-center gap-2 mt-2"
             >
               {loading ? (
                 <>
@@ -165,7 +170,7 @@ export default function SignupPage() {
 
           <p className="text-center text-sm text-[#6B7280] mt-5">
             Already have an account?{" "}
-            <Link href="/login" className="text-[#2D9B83] font-medium hover:underline">
+            <Link href="/login" className="text-[#1B3A6B] font-medium hover:underline">
               Log in.
             </Link>
           </p>

@@ -25,21 +25,6 @@ body {
   font-family: 'Playfair Display', Georgia, serif;
 }
 
-/* Subtle noise overlay for dark sections */
-.noise::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.035;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='250' height='250'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='250' height='250' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
-.noise > * {
-  position: relative;
-  z-index: 1;
-}
 
 /* Brief card shadow transition — can't be done with Tailwind arbitrary hover values in a Server Component */
 .brief-card {
@@ -53,5 +38,180 @@ body {
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Global animation system
+   ───────────────────────────────────────────────────────────── */
+
+/* Smooth transitions for all interactive elements */
+button,
+a,
+input,
+textarea,
+select {
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+button:disabled {
+  transition: none;
+}
+
+/* Smooth focus rings */
+*:focus-visible {
+  outline: 2px solid #1B3A6B;
+  outline-offset: 2px;
+  border-radius: 4px;
+  transition: outline-offset 150ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Card hover lift effect */
+.card-hover {
+  transition:
+    transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* Button press effect */
+.btn-press:active {
+  transform: scale(0.98);
+  transition: transform 80ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Page enter — apply on <main> */
+main {
+  animation: pageEnter 400ms cubic-bezier(0, 0, 0.2, 1);
+}
+@keyframes pageEnter {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Hero on-load animation */
+@keyframes heroEnter {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hero-enter {
+  animation: heroEnter 600ms cubic-bezier(0, 0, 0.2, 1) both;
+}
+
+/* Skeleton loading shimmer */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+/* Breathing animation for processing states */
+@keyframes breathe {
+  0%, 100% { transform: scale(1);    opacity: 0.8; }
+  50%      { transform: scale(1.05); opacity: 1; }
+}
+.animate-breathe {
+  animation: breathe 2.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Smooth spinner */
+@keyframes smoothSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.animate-spin-smooth {
+  animation: smoothSpin 800ms linear infinite;
+}
+
+/* Gentle success bounce */
+@keyframes successBounce {
+  0%   { transform: scale(0);    opacity: 0; }
+  60%  { transform: scale(1.1);  opacity: 1; }
+  80%  { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+.animate-success {
+  animation: successBounce 500ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Chat message appear */
+@keyframes messageSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-message {
+  animation: messageSlideIn 250ms cubic-bezier(0, 0, 0.2, 1) forwards;
+}
+
+/* Typing dots */
+@keyframes typingDot {
+  0%, 60%, 100% { transform: translateY(0);   opacity: 0.4; }
+  30%           { transform: translateY(-4px); opacity: 1; }
+}
+.typing-dot {
+  display: inline-block;
+}
+.typing-dot:nth-child(1) { animation: typingDot 1.2s infinite 0ms; }
+.typing-dot:nth-child(2) { animation: typingDot 1.2s infinite 200ms; }
+.typing-dot:nth-child(3) { animation: typingDot 1.2s infinite 400ms; }
+
+/* Upload zone border pulse when dragging */
+@keyframes borderPulse {
+  0%, 100% {
+    border-color: #1B3A6B;
+    box-shadow: 0 0 0 0 rgba(27, 58, 107, 0.2);
+  }
+  50% {
+    border-color: #1B3A6B;
+    box-shadow: 0 0 0 6px rgba(27, 58, 107, 0);
+  }
+}
+.animate-drag {
+  animation: borderPulse 1.4s ease-in-out infinite;
+}
+
+/* Ken Burns — very slow zoom on auth photos */
+@keyframes kenBurns {
+  0%   { transform: scale(1); }
+  100% { transform: scale(1.05); }
+}
+.ken-burns {
+  animation: kenBurns 12s ease-in-out infinite alternate;
+}
+
+/* Auth form right-panel entry */
+@keyframes authFormEnter {
+  from { opacity: 0; transform: translateX(10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.auth-form-enter {
+  animation: authFormEnter 500ms cubic-bezier(0, 0, 0.2, 1) both;
+}
+
+/* Quiz question crossfade */
+@keyframes quizQuestionIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.animate-quiz-in {
+  animation: quizQuestionIn 200ms cubic-bezier(0, 0, 0.2, 1) both;
+}
+
+/* Honor the user's motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

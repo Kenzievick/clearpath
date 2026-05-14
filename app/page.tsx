@@ -1,62 +1,371 @@
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
 import { Fragment } from "react";
+import { Shield, Lock, EyeOff, Trash2, Award } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { FadeIn } from "@/components/FadeIn";
 
-/* ─── Photo registry ─────────────────────────────────────────────────────── */
-const P = {
-  hero: "https://images.unsplash.com/photo-1531983412531-1f49a365ffed?w=1200&q=80",
-  pain: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?w=900&q=80",
-  trust: "https://images.unsplash.com/photo-1476703993599-0035a21b17a9?w=900&q=80",
-  stepOne: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&q=80",
-  stepThree: "https://images.unsplash.com/photo-1476703993599-0035a21b17a9?w=800&q=80",
+/* ─── Palette ────────────────────────────────────────────────────────────── */
+const C = {
+  darkBg: "#0B0E0D",
+  lightBg: "#FAFAF7",
+  inkLight: "#0B0E0D",
+  inkDark: "#FFFFFF",
+  mutedLight: "#5C6360",
+  mutedDark: "#A8B0AC",
+  accent: "#1B3A6B",
+  accentHover: "#152D54",
+  scoreLow: "#C04A3A",
+  scoreMid: "#C8893A",
+  scoreOk: "#1B3A6B",
+  rule: "#E5E7EB",
+  ruleDark: "#1F2422",
+  pill: "#F3F4F6",
+  dotIdle: "#D1D5DB",
 };
 
 /* ─── Data ───────────────────────────────────────────────────────────────── */
 const stats = [
-  { value: "8.2M+", label: "active IEPs in the US" },
-  { value: "12+", label: "states represented" },
-  { value: "~5 min", label: "to your brief" },
+  { value: "8.2M+", label: "ACTIVE IEPs IN THE US" },
+  { value: "15–30", label: "PAGES IN THE AVERAGE REPORT" },
+  { value: "~5 min", label: "TO YOUR BRIEF" },
+  { value: "25 years", label: "SPECIAL ED DIRECTOR EXPERTISE" },
 ];
 
 const briefCards = [
   {
     n: "01",
     title: "What This Report Is Saying",
-    body: "A plain-English summary of everything the evaluators found, written at an 8th-grade reading level. No acronyms without explanation. No clinical jargon without translation.",
+    body: "We read the report the way a special ed director would and tell you what they'd tell their own sister. No acronyms. No clinical hedging. Two paragraphs, the whole picture.",
   },
   {
     n: "02",
     title: "Your Child's Scores Explained",
-    body: "For every assessment battery in the report: what the test measures, what your child's specific score means compared to peers, and what it looks like in the classroom every day.",
+    body: "For every test in the report — WISC-V, WIAT-IV, BASC-3, whatever they ran — we tell you what it measures, what your child's number actually means, and what that looks like when your kid sits down in a classroom.",
   },
   {
     n: "03",
     title: "Services Your Child May Qualify For",
-    body: "A list of related services and special education supports that your child's score profile typically unlocks — framed to help you have the right conversation, not make legal claims.",
+    body: "Based on the full score profile, we show you the services families in similar situations have successfully requested. Not legal advice — a starting point so you know what to ask for and why.",
   },
   {
     n: "04",
     title: "Accommodations Worth Requesting",
-    body: "A state-specific accommodations menu organized by category, with one sentence explaining exactly why each accommodation applies to your child's specific profile.",
+    body: "A full list of accommodations organized by category, with one sentence on why each one fits your child specifically. Not a generic list you could Google. One built from your child's actual scores.",
   },
   {
     n: "05",
     title: "Your 10 Questions for the Meeting",
-    body: "Ten specific questions drawn directly from your child's report — not generic IEP questions. Each one designed to yield a specific commitment from the district.",
+    body: "Ten questions pulled directly from your child's report — not from an IEP template. Each one is designed to get a specific answer from the district, not a vague commitment that disappears after you sign.",
   },
   {
     n: "06",
     title: "What to Watch For",
-    body: "What a strong IEP looks like versus a weak one for your child's profile. The vague language to push back on. The specific, measurable goal language to ask for.",
+    body: "We tell you what a strong IEP looks like for your child's profile and what a weak one looks like. The phrases that sound reasonable but mean nothing. The language worth fighting to change before you sign.",
   },
   {
     n: "07",
     title: "Know Your Rights",
-    body: "State-specific procedural rights, correct meeting terminology, key timelines, and your right to request an Independent Educational Evaluation if you disagree with the district.",
+    body: "Your state's specific procedural rights, the correct name for your meeting (PPT in Connecticut, ARD in Texas), the timelines the district has to follow, and what to do if you think the evaluation missed something.",
   },
 ];
+
+const scoreRows = [
+  {
+    name: "Processing Speed Index",
+    score: "74",
+    width: 30,
+    color: C.scoreLow,
+    note: "4th percentile · Significant difficulty — affects timed tasks and written output",
+  },
+  {
+    name: "Working Memory Index",
+    score: "81",
+    width: 45,
+    color: C.scoreMid,
+    note: "10th percentile · Moderate difficulty — impacts multi-step instructions",
+  },
+  {
+    name: "Verbal Comprehension Index",
+    score: "103",
+    width: 68,
+    color: C.scoreOk,
+    note: "58th percentile · Age-appropriate · Relative strength to leverage",
+  },
+];
+
+/* ─── Style tokens ───────────────────────────────────────────────────────── */
+const labelStyle = { fontSize: "13px", letterSpacing: "0.16em" } as const;
+const tinyLabelStyle = { fontSize: "11px", letterSpacing: "0.14em" } as const;
+const bodyLargeStyle = { fontSize: "19px", lineHeight: "1.7" } as const;
+
+/* ─── Hero product card ──────────────────────────────────────────────────── */
+function ReportCard() {
+  return (
+    <div
+      className="bg-white rounded-2xl w-full lg:w-[420px]"
+      style={{
+        boxShadow: "0 20px 60px rgba(0,0,0,0.4)",
+        padding: "24px",
+      }}
+    >
+      {/* Header */}
+      <div className="flex items-start justify-between mb-5">
+        <span
+          className="uppercase font-semibold"
+          style={{ ...tinyLabelStyle, color: C.mutedLight }}
+        >
+          WISC-V · Wechsler Intelligence Scale
+        </span>
+        <span
+          className="inline-flex items-center gap-1.5 uppercase font-semibold"
+          style={{ ...tinyLabelStyle, color: C.mutedLight }}
+        >
+          <span
+            className="w-1.5 h-1.5 rounded-full"
+            style={{ background: C.accent }}
+          />
+          Processing complete
+        </span>
+      </div>
+
+      {/* Score rows */}
+      <div className="space-y-4">
+        {scoreRows.map((r) => (
+          <div key={r.name}>
+            <div className="flex items-center justify-between mb-1.5">
+              <span
+                style={{ fontSize: "14px", fontWeight: 600, color: C.inkLight }}
+              >
+                {r.name}
+              </span>
+              <span
+                style={{ fontSize: "14px", fontWeight: 700, color: C.inkLight }}
+              >
+                {r.score}
+              </span>
+            </div>
+            <div
+              className="rounded-full overflow-hidden"
+              style={{ height: "6px", background: C.pill }}
+            >
+              <div
+                className="h-full rounded-full"
+                style={{ width: `${r.width}%`, background: r.color }}
+              />
+            </div>
+            <p style={{ fontSize: "12px", color: C.mutedLight, marginTop: "6px" }}>
+              {r.note}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ borderTop: `1px solid ${C.pill}`, margin: "20px 0" }} />
+
+      {/* Plain-English Summary */}
+      <div className="mb-5">
+        <div
+          className="uppercase font-semibold mb-2"
+          style={{ ...tinyLabelStyle, color: C.mutedLight }}
+        >
+          What this means for school
+        </div>
+        <p style={{ fontSize: "13px", color: C.mutedLight, lineHeight: 1.6 }}>
+          Your child processes information more slowly than peers and has
+          difficulty holding multiple pieces of information in mind at once.
+          This affects timed tests, written assignments, and following
+          multi-step directions.
+        </p>
+      </div>
+
+      {/* Services */}
+      <div>
+        <div
+          className="uppercase font-semibold mb-2.5"
+          style={{ ...tinyLabelStyle, color: C.mutedLight }}
+        >
+          Recommended to request
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {[
+            "Extended time on assessments",
+            "Resource room support",
+            "Preferential seating",
+          ].map((s) => (
+            <span
+              key={s}
+              className="rounded-full"
+              style={{
+                background: C.pill,
+                color: C.inkLight,
+                fontSize: "12px",
+                padding: "5px 11px",
+              }}
+            >
+              {s}
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Pain timeline card ─────────────────────────────────────────────────── */
+function TimelineCard() {
+  const rows = [
+    { color: C.accent, title: "Evaluation report received", note: "Today", noteColor: C.mutedLight },
+    { color: C.dotIdle, title: "IEP meeting scheduled", note: "14 days", noteColor: C.scoreLow },
+    { color: C.dotIdle, title: "You need to be ready", note: "Before day 14", noteColor: C.mutedLight },
+  ];
+  return (
+    <div
+      className="bg-white rounded-xl w-full"
+      style={{
+        maxWidth: "400px",
+        padding: "32px",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.06), 0 16px 40px rgba(0,0,0,0.08)",
+      }}
+    >
+      <div
+        className="uppercase font-semibold mb-6"
+        style={{ fontSize: "14px", letterSpacing: "0.14em", color: C.mutedLight }}
+      >
+        Your timeline
+      </div>
+
+      <div className="relative">
+        <div
+          aria-hidden
+          className="absolute left-[5px] top-2 bottom-2 w-px"
+          style={{ background: C.dotIdle }}
+        />
+        {rows.map((r, i) => (
+          <div
+            key={r.title}
+            className="relative flex items-start gap-4"
+            style={{ marginBottom: i === rows.length - 1 ? 0 : "20px" }}
+          >
+            <div
+              className="rounded-full mt-1.5 flex-shrink-0 relative z-10"
+              style={{ width: "11px", height: "11px", background: r.color, boxShadow: `0 0 0 3px ${C.lightBg}` }}
+            />
+            <div>
+              <div style={{ fontSize: "15px", fontWeight: 600, color: C.inkLight }}>
+                {r.title}
+              </div>
+              <div style={{ fontSize: "13px", color: r.noteColor, marginTop: "2px" }}>
+                {r.note}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ borderTop: `1px solid ${C.pill}`, marginTop: "24px", paddingTop: "16px" }}>
+        <p style={{ fontSize: "12px", color: C.mutedLight, fontStyle: "italic", lineHeight: 1.6 }}>
+          Federal law gives districts 30 days from report to meeting. Most
+          parents get less than two weeks notice.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Upload zone (step 1) ───────────────────────────────────────────────── */
+function UploadZone() {
+  return (
+    <div
+      className="rounded-xl text-center w-full"
+      style={{
+        background: "#F9FAFB",
+        border: `1.5px dashed ${C.dotIdle}`,
+        padding: "40px 24px",
+      }}
+    >
+      <svg
+        className="mx-auto mb-4"
+        width="28"
+        height="28"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#9CA3AF"
+        strokeWidth={1.8}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="17 8 12 3 7 8" />
+        <line x1="12" y1="3" x2="12" y2="15" />
+      </svg>
+      <p style={{ fontSize: "16px", color: C.mutedLight, marginBottom: "6px" }}>
+        Drop your evaluation report here
+      </p>
+      <p style={{ fontSize: "13px", color: "#9CA3AF", marginBottom: "20px" }}>
+        PDF up to 50MB · Processed in memory · Never stored
+      </p>
+      <button
+        type="button"
+        className="rounded-full text-white font-semibold"
+        style={{ background: C.accent, padding: "10px 20px", fontSize: "14px" }}
+      >
+        Browse files
+      </button>
+    </div>
+  );
+}
+
+/* ─── Phone mockup (step 3) ──────────────────────────────────────────────── */
+function PhoneMock() {
+  return (
+    <div className="flex flex-col items-center">
+      <div
+        className="rounded-[36px] mx-auto"
+        style={{
+          background: C.darkBg,
+          border: `2px solid #374151`,
+          padding: "28px 18px",
+          width: "240px",
+          height: "380px",
+        }}
+      >
+        <div
+          className="bg-white rounded-xl p-4 h-full flex flex-col"
+          style={{ boxShadow: "0 4px 14px rgba(0,0,0,0.2)" }}
+        >
+          <div className="flex items-center gap-2 mb-4">
+            <div
+              className="rounded-full flex items-center justify-center"
+              style={{ background: C.accent, width: "20px", height: "20px" }}
+            >
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={3.5} strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <div style={{ fontSize: "14px", fontWeight: 700, color: C.inkLight }}>
+              Your Brief is ready
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div className="h-2 rounded-full" style={{ background: C.pill, width: "90%" }} />
+            <div className="h-2 rounded-full" style={{ background: C.pill, width: "75%" }} />
+            <div className="h-2 rounded-full" style={{ background: C.pill, width: "85%" }} />
+            <div className="h-2 rounded-full" style={{ background: C.pill, width: "60%" }} />
+            <div className="h-2 rounded-full" style={{ background: C.pill, width: "80%" }} />
+          </div>
+        </div>
+      </div>
+      <button
+        type="button"
+        className="rounded-full text-white font-semibold mt-6"
+        style={{ background: C.accent, padding: "10px 22px", fontSize: "14px" }}
+      >
+        Download PDF
+      </button>
+    </div>
+  );
+}
 
 /* ─── Page ───────────────────────────────────────────────────────────────── */
 export default function HomePage() {
@@ -64,520 +373,564 @@ export default function HomePage() {
     <div className="bg-white overflow-x-hidden">
       <Navbar />
 
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* HERO — cinematic split: dark left, photo right                     */}
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      <section className="noise relative bg-[#0F1117] min-h-[calc(100svh-68px)] flex items-center overflow-hidden">
-        {/* Photo — fills right 52% of the hero on desktop */}
-        <div className="hidden lg:block absolute right-0 top-0 bottom-0 w-[52%]">
-          <Image
-            src={P.hero}
-            alt="A parent reviewing their child's neuropsychological evaluation report"
-            fill
-            className="object-cover object-top"
-            priority
-          />
-          {/* Gradient: dark bleeds into the photo from left */}
-          <div
-            aria-hidden
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(to right, #0F1117 0%, rgba(15,17,23,0.85) 20%, rgba(15,17,23,0.4) 55%, rgba(15,17,23,0.1) 100%)",
-            }}
-          />
-          {/* Subtle teal tint overlay at the very bottom of the photo */}
-          <div
-            aria-hidden
-            className="absolute bottom-0 left-0 right-0 h-48"
-            style={{
-              background:
-                "linear-gradient(to top, rgba(45,155,131,0.12), transparent)",
-            }}
-          />
-        </div>
-
-        {/* Mobile photo (stacks above text) */}
-        <div className="lg:hidden absolute top-0 left-0 right-0 h-72 sm:h-96">
-          <Image
-            src={P.hero}
-            alt="A parent reviewing their child's evaluation report"
-            fill
-            className="object-cover object-top"
-            priority
-          />
-          <div
-            aria-hidden
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(to bottom, transparent 0%, #0F1117 85%)",
-            }}
-          />
-        </div>
-
-        {/* Content */}
-        <div className="relative z-10 max-w-6xl mx-auto w-full px-6 py-16 lg:py-24 mt-56 lg:mt-0">
-          <div className="max-w-[54%] lg:max-w-[48%]">
-            {/* Label */}
-            <div className="inline-flex items-center gap-2 mb-8">
-              <div className="w-5 h-px bg-[#2D9B83]" />
-              <span
-                className="text-[#2D9B83] text-xs font-semibold uppercase"
-                style={{ letterSpacing: "0.12em" }}
-              >
-                Built for IEP meetings
-              </span>
-            </div>
-
-            {/* Headline — size contrast creates visual hierarchy */}
-            <h1 className="mb-7">
-              <span
-                className="block text-[#9CA3AF] font-light"
-                style={{
-                  fontSize: "clamp(16px, 2vw, 22px)",
-                  letterSpacing: "0.01em",
-                  marginBottom: "6px",
-                }}
-              >
-                Finally understand
-              </span>
-              <span
-                className="block text-white font-extrabold font-display"
-                style={{
-                  fontSize: "clamp(38px, 5.5vw, 68px)",
-                  lineHeight: "1.05",
-                  letterSpacing: "-0.025em",
-                }}
-              >
-                your child&apos;s
-                <br />
-                evaluation report.
-              </span>
-            </h1>
-
-            <p
-              className="text-[#9CA3AF] mb-10 leading-relaxed"
-              style={{ fontSize: "clamp(16px, 1.5vw, 19px)", maxWidth: "480px" }}
-            >
-              Clearpath reads your child&apos;s neuropsychological report and
-              gives you a plain-English brief, the right questions to ask, and
-              the services worth requesting — before you walk into the IEP
-              meeting.
-            </p>
-
-            {/* CTAs */}
-            <div className="flex flex-wrap items-center gap-3 mb-10">
-              <Link
-                href="/signup"
-                className="inline-flex items-center gap-2 bg-[#2D9B83] hover:bg-[#238A72] text-white font-semibold rounded-full transition-all duration-200"
-                style={{
-                  padding: "14px 28px",
-                  fontSize: "16px",
-                  boxShadow:
-                    "0 0 0 1px rgba(45,155,131,0.4), 0 4px 24px rgba(45,155,131,0.3)",
-                }}
-              >
-                Get Your Free Brief
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2.5}
+      {/* HERO */}
+      <section
+        className="relative flex items-center overflow-hidden"
+        style={{ background: C.darkBg, minHeight: "calc(100svh - 68px)" }}
+      >
+        <div className="relative z-10 max-w-6xl mx-auto w-full px-6 py-16 lg:py-24">
+          <div className="grid lg:grid-cols-[1fr_auto] gap-12 lg:gap-16 items-center">
+            {/* Left: copy */}
+            <div className="max-w-xl hero-enter">
+              <div className="inline-flex items-center gap-2 mb-8">
+                <div className="w-5 h-px" style={{ background: C.mutedDark }} />
+                <span
+                  className="font-semibold uppercase"
+                  style={{ ...labelStyle, color: C.mutedDark }}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
-                </svg>
-              </Link>
-              <a
-                href="#brief-sections"
-                className="inline-flex items-center gap-2 text-white/70 hover:text-white font-medium rounded-full border border-white/15 hover:border-white/30 transition-all duration-200"
-                style={{ padding: "14px 24px", fontSize: "15px" }}
+                  Built for the meeting that changes everything.
+                </span>
+              </div>
+
+              <h1 className="mb-6">
+                <span
+                  className="block text-white"
+                  style={{
+                    fontFamily: "Inter, system-ui, sans-serif",
+                    fontWeight: 400,
+                    fontSize: "clamp(22px, 3vw, 32px)",
+                    letterSpacing: "-0.01em",
+                    marginBottom: "8px",
+                  }}
+                >
+                  They have experts.
+                </span>
+                <span
+                  className="block font-extrabold font-display text-white"
+                  style={{
+                    fontSize: "clamp(40px, 6vw, 64px)",
+                    lineHeight: "1.05",
+                    letterSpacing: "-0.025em",
+                  }}
+                >
+                  Now you have one too.
+                </span>
+              </h1>
+
+              <div
+                className="inline-flex items-center gap-2 mb-7"
+                style={{ color: C.mutedDark, fontSize: "14px", lineHeight: 1.5 }}
               >
-                See what&apos;s inside
-              </a>
+                <Award className="w-4 h-4 flex-shrink-0" style={{ color: C.accent }} strokeWidth={2} />
+                <span>
+                  Built with a 25-year Special Education Director who has run
+                  thousands of IEP meetings
+                </span>
+              </div>
+
+              <p
+                className="mb-10"
+                style={{ ...bodyLargeStyle, color: C.mutedDark, maxWidth: "540px" }}
+              >
+                Twenty pages of clinical scores. One meeting that shapes the
+                next decade. Clearpath reads the report and gives you a
+                plain-English brief — what each score means, which services to
+                request, and the ten questions to bring to the table.
+              </p>
+
+              <div className="flex flex-wrap items-center gap-3 mb-6">
+                <Link
+                  href="/signup"
+                  className="btn-press inline-flex items-center gap-2 text-white font-semibold rounded-full transition-colors"
+                  style={{
+                    background: C.accent,
+                    padding: "14px 28px",
+                    fontSize: "16px",
+                  }}
+                >
+                  Translate my report — free
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </Link>
+                <Link
+                  href="/quiz"
+                  className="inline-flex items-center gap-2 text-white font-medium rounded-full transition-colors"
+                  style={{
+                    border: "1px solid rgba(255,255,255,0.25)",
+                    padding: "13px 24px",
+                    fontSize: "15px",
+                  }}
+                >
+                  Not sure where to start? Take the quiz
+                </Link>
+              </div>
+
+              <p style={{ color: C.mutedDark, fontSize: "13px", marginBottom: "24px" }}>
+                Free translation. Full meeting brief is $27, money-back if it
+                doesn&apos;t help.
+              </p>
+
+              {/* Data trust pills */}
+              <div className="flex flex-wrap gap-3 mb-6" style={{ marginTop: "24px" }}>
+                {[
+                  { Icon: Shield,  label: "Your data is never sold" },
+                  { Icon: Lock,    label: "Encrypted at rest" },
+                  { Icon: EyeOff,  label: "We never train on your data" },
+                  { Icon: Trash2,  label: "Delete everything anytime" },
+                ].map(({ Icon, label }) => (
+                  <span
+                    key={label}
+                    className="inline-flex items-center gap-1.5 rounded-full"
+                    style={{
+                      background: "#1A1F1E",
+                      color: C.mutedDark,
+                      fontSize: "12px",
+                      padding: "8px 14px",
+                    }}
+                  >
+                    <Icon className="w-3.5 h-3.5" strokeWidth={1.8} />
+                    {label}
+                  </span>
+                ))}
+              </div>
+
+              {/* Stats */}
+              <div
+                className="flex flex-wrap items-center gap-x-6 gap-y-5 pt-8"
+                style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
+              >
+                {stats.map((stat, i) => (
+                  <Fragment key={stat.label}>
+                    {i > 0 && (
+                      <div
+                        className="w-px h-8 hidden sm:block"
+                        style={{ background: "#4B5563" }}
+                      />
+                    )}
+                    <div>
+                      <div
+                        className="text-white font-bold leading-none mb-1"
+                        style={{ fontSize: "30px" }}
+                      >
+                        {stat.value}
+                      </div>
+                      <div
+                        style={{
+                          color: C.mutedDark,
+                          fontSize: "10px",
+                          letterSpacing: "0.12em",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        {stat.label}
+                      </div>
+                    </div>
+                  </Fragment>
+                ))}
+              </div>
             </div>
 
-            {/* Stats bar */}
-            <div
-              className="flex flex-wrap items-center gap-6 pt-8"
-              style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
-            >
-              {stats.map((stat, i) => (
-                <Fragment key={stat.label}>
-                  {i > 0 && (
-                    <div className="w-px h-7 bg-white/10 hidden sm:block" />
-                  )}
-                  <div>
-                    <div className="text-white font-semibold text-base leading-none mb-1">
-                      {stat.value}
-                    </div>
-                    <div
-                      className="text-[#6B7280]"
-                      style={{ fontSize: "11px", letterSpacing: "0.08em", textTransform: "uppercase" }}
-                    >
-                      {stat.label}
-                    </div>
-                  </div>
-                </Fragment>
-              ))}
+            {/* Right: report card mock */}
+            <div className="lg:justify-self-end">
+              <ReportCard />
             </div>
           </div>
         </div>
-
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden lg:flex flex-col items-center gap-2 animate-bounce">
-          <svg
-            className="w-5 h-5 text-[#4B5563]"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={1.5}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
-        </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* PAIN — the gut punch. The emotional mirror.                        */}
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      <section className="bg-[#FAFAF8] px-6 py-24 lg:py-32 overflow-hidden">
+      {/* PAIN */}
+      <section
+        className="px-6 py-24 lg:py-32 overflow-hidden"
+        style={{ background: C.lightBg }}
+      >
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-14 lg:gap-20 items-center">
-
-            {/* Photo — parent at kitchen table, tired, papers everywhere */}
-            <FadeIn direction="left" className="order-2 lg:order-1">
-              <div className="relative">
-                {/* Teal corner accent */}
-                <div
-                  className="absolute -bottom-4 -left-4 w-24 h-24 rounded-2xl"
-                  style={{ background: "rgba(45,155,131,0.12)", zIndex: 0 }}
+            <FadeIn direction="left" className="order-2 lg:order-1 flex flex-col items-center lg:items-start gap-6">
+              {/* Warm photo above the timeline — a real family, not just a clock */}
+              <div
+                className="relative w-full overflow-hidden rounded-2xl"
+                style={{
+                  maxWidth: "440px",
+                  aspectRatio: "4 / 3",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.06), 0 18px 44px rgba(0,0,0,0.10)",
+                }}
+              >
+                <Image
+                  src="https://images.unsplash.com/photo-1609220136736-443140cffec6?w=2000&q=90&auto=format&fit=crop"
+                  alt="A parent and child reading together at home"
+                  fill
+                  quality={95}
+                  sizes="(min-width: 1024px) 440px, 100vw"
+                  className="object-cover"
+                  style={{ objectPosition: "center" }}
                 />
                 <div
-                  className="relative rounded-2xl overflow-hidden"
+                  aria-hidden
+                  className="absolute inset-0 pointer-events-none"
                   style={{
-                    boxShadow:
-                      "0 2px 8px rgba(0,0,0,0.06), 0 16px 48px rgba(0,0,0,0.10)",
-                    zIndex: 1,
+                    background:
+                      "linear-gradient(to top, rgba(11,14,13,0.18), rgba(11,14,13,0) 40%)",
                   }}
-                >
-                  <div className="aspect-[4/3] relative">
-                    <Image
-                      src={P.pain}
-                      alt="A parent sitting at the kitchen table late at night reviewing evaluation paperwork"
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                </div>
+                />
               </div>
+              <TimelineCard />
             </FadeIn>
 
-            {/* Text */}
             <div className="order-1 lg:order-2">
               <FadeIn delay={60}>
                 <div
-                  className="text-xs font-semibold text-[#2D9B83] uppercase mb-5"
-                  style={{ letterSpacing: "0.12em" }}
+                  className="font-semibold uppercase mb-5"
+                  style={{ ...labelStyle, color: C.mutedLight }}
                 >
                   The moment we built this for
                 </div>
                 <h2
-                  className="font-bold text-[#0F1117] mb-8 leading-tight"
+                  className="font-bold mb-8 leading-tight"
                   style={{
+                    color: C.inkLight,
                     fontSize: "clamp(26px, 3.5vw, 38px)",
                     letterSpacing: "-0.02em",
                   }}
                 >
-                  You received a report.
+                  You got the report.
                   <br />
-                  Nobody explained what it means.
+                  Now you have two weeks.
                 </h2>
               </FadeIn>
 
               <FadeIn delay={120}>
-                <p className="text-[#374151] text-lg leading-relaxed mb-8">
-                  Your child just had a neuropsychological evaluation. The
-                  school handed you 20 pages of scores, indices, and clinical
-                  terminology — and scheduled a meeting in two weeks where
-                  you&apos;ll be expected to advocate for services you don&apos;t
-                  yet know your child qualifies for.
+                <p className="mb-6" style={{ ...bodyLargeStyle, color: "#374151" }}>
+                  Your child just had an evaluation. The school sent home a
+                  document with composite scores, percentile ranks, standard
+                  deviations, and clinical recommendations — and a meeting
+                  invitation for two weeks from now. You are expected to walk
+                  into that meeting and advocate for services. Nobody explained
+                  how.
+                </p>
+                <p className="mb-8" style={{ ...bodyLargeStyle, color: "#374151" }}>
+                  The team running the meeting has been through hundreds of
+                  these. They know what every score means, what services each
+                  score range typically triggers, and what the district can
+                  offer without raising a budget concern. You are reading the
+                  report for the first time.
                 </p>
               </FadeIn>
 
-              {/* Editorial pull quote — the emotional center of the section */}
               <FadeIn delay={180}>
                 <div
-                  className="my-8 pl-6"
-                  style={{ borderLeft: "3px solid #2D9B83" }}
+                  style={{
+                    borderLeft: `3px solid ${C.accent}`,
+                    paddingLeft: "20px",
+                    margin: "32px 0",
+                  }}
                 >
                   <p
-                    className="font-display italic text-[#0F1117]"
                     style={{
-                      fontSize: "clamp(22px, 2.5vw, 30px)",
-                      lineHeight: "1.4",
-                      letterSpacing: "-0.01em",
+                      fontFamily: "Inter, system-ui, sans-serif",
+                      fontSize: "18px",
+                      lineHeight: 1.7,
+                      color: C.inkLight,
                     }}
                   >
-                    &ldquo;sitting at your kitchen table at 11pm, trying to
-                    figure out what a processing speed index of 74 actually
-                    means for your kid.&rdquo;
+                    A processing speed index of 74 means something specific. It
+                    unlocks specific accommodations. It supports specific service
+                    requests. You should not have to figure that out at 11pm the
+                    night before the meeting.
                   </p>
                 </div>
               </FadeIn>
 
               <FadeIn delay={240}>
-                <p className="text-[#374151] text-lg leading-relaxed mb-8">
-                  The evaluators are experts. The district has lawyers and
-                  administrators.
-                </p>
-                <p
-                  className="font-semibold text-[#0F1117]"
-                  style={{ fontSize: "18px" }}
-                >
-                  Clearpath was built for exactly this moment.
+                <p className="font-semibold" style={{ color: C.inkLight, fontSize: "19px" }}>
+                  Clearpath was built so you don&apos;t have to.
                 </p>
               </FadeIn>
             </div>
           </div>
+
+          {/* Quiz entry callout */}
+          <FadeIn className="mt-16 lg:mt-20">
+            <div
+              className="bg-white rounded-xl mx-auto"
+              style={{
+                border: "1px solid #D1D5DB",
+                padding: "24px",
+                maxWidth: "560px",
+              }}
+            >
+              <div
+                className="font-semibold uppercase mb-2"
+                style={{ ...labelStyle, color: C.accent, fontSize: "11px" }}
+              >
+                Don&apos;t have a report yet?
+              </div>
+              <h3
+                className="font-bold mb-3"
+                style={{ color: C.inkLight, fontSize: "20px", letterSpacing: "-0.01em" }}
+              >
+                Not sure if your child needs an evaluation?
+              </h3>
+              <p className="mb-5" style={{ color: C.mutedLight, fontSize: "15px", lineHeight: 1.6 }}>
+                Answer 5 quick questions and we&apos;ll tell you where you
+                stand — whether that&apos;s requesting an evaluation,
+                understanding the difference between a 504 and an IEP, or
+                knowing what to do before the school acts.
+              </p>
+              <Link
+                href="/quiz"
+                className="btn-press inline-flex items-center gap-2 text-white font-semibold rounded-lg transition-colors"
+                style={{ background: C.accent, padding: "11px 22px", fontSize: "14px" }}
+              >
+                Take the free quiz
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </Link>
+            </div>
+          </FadeIn>
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* HOW IT WORKS — vertical stepped, alternating, editorial            */}
-      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {/* HOW IT WORKS */}
       <section className="bg-white px-6 py-24 lg:py-32 overflow-hidden">
         <div className="max-w-5xl mx-auto">
-          {/* Header */}
           <FadeIn className="text-center mb-20">
             <div
-              className="text-xs font-semibold text-[#2D9B83] uppercase mb-4"
-              style={{ letterSpacing: "0.12em" }}
+              className="font-semibold uppercase mb-4"
+              style={{ ...labelStyle, color: C.mutedLight }}
             >
               The process
             </div>
             <h2
-              className="font-bold text-[#0F1117] mb-4"
+              className="font-bold mb-4"
               style={{
+                color: C.inkLight,
                 fontSize: "clamp(28px, 4vw, 42px)",
                 letterSpacing: "-0.02em",
               }}
             >
-              From report to meeting-ready in minutes.
+              Four steps. About five minutes.
             </h2>
-            <p className="text-[#6B7280] text-xl max-w-md mx-auto">
-              Three steps. No jargon. No confusion.
+            <p style={{ color: C.mutedLight, fontSize: "20px", maxWidth: "32rem", margin: "0 auto" }}>
+              From the PDF on your kitchen table to a brief you can bring to the
+              meeting.
             </p>
           </FadeIn>
 
-          {/* Steps — alternating layout with teal left rail */}
           <div className="relative">
-            {/* Vertical teal connector rail */}
+            {/* Neutral timeline rail */}
             <div
               aria-hidden
               className="hidden lg:block absolute left-6 top-12 bottom-12 w-px"
-              style={{
-                background:
-                  "linear-gradient(to bottom, transparent, #2D9B83 12%, #2D9B83 88%, transparent)",
-              }}
+              style={{ background: C.dotIdle }}
             />
 
-            {/* ── Step 1 ── */}
+            {/* Step 1 */}
             <FadeIn className="relative lg:pl-20 py-12 lg:py-16">
-              {/* Rail dot */}
               <div
                 aria-hidden
-                className="hidden lg:block absolute left-[19px] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-[#2D9B83]"
-                style={{ boxShadow: "0 0 0 4px rgba(45,155,131,0.2)" }}
+                className="hidden lg:block absolute left-[19px] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full"
+                style={{ background: C.accent }}
               />
-              {/* Faded background step number */}
-              <div
-                aria-hidden
-                className="absolute top-0 right-0 font-display font-bold select-none pointer-events-none leading-none text-[#2D9B83]"
-                style={{
-                  fontSize: "clamp(100px, 14vw, 180px)",
-                  opacity: 0.04,
-                  lineHeight: 1,
-                  top: "-10px",
-                }}
-              >
-                01
-              </div>
-
               <div className="grid lg:grid-cols-[1fr_1fr] gap-10 lg:gap-16 items-center">
-                {/* Photo */}
-                <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.06),_0_16px_40px_rgba(0,0,0,0.08)]">
-                  <Image
-                    src={P.stepOne}
-                    alt="A child working with a teacher or learning specialist"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                {/* Text */}
-                <div>
+                <div className="lg:order-1">
                   <div
-                    className="text-xs font-semibold text-[#2D9B83] uppercase mb-3"
-                    style={{ letterSpacing: "0.12em" }}
+                    className="font-semibold uppercase mb-3"
+                    style={{ ...labelStyle, color: C.mutedLight }}
                   >
                     Step 1
                   </div>
                   <h3
-                    className="font-bold text-[#0F1117] mb-4 font-display"
+                    className="font-bold mb-4 font-display"
                     style={{
+                      color: C.inkLight,
                       fontSize: "clamp(22px, 2.5vw, 30px)",
                       letterSpacing: "-0.015em",
                     }}
                   >
-                    Upload your child&apos;s report
+                    Add your child&apos;s profile
                   </h3>
-                  <p className="text-[#6B7280] text-lg leading-relaxed">
-                    Forward the PDF the school or private evaluator gave you —
-                    the 15 to 30 page document with all the scores. Clearpath
-                    accepts any standard neuropsychological or psychoeducational
-                    evaluation format.
+                  <p style={{ ...bodyLargeStyle, color: C.mutedLight }}>
+                    Tell Clearpath about your child — their name, age, grade,
+                    state, and any known diagnoses. This takes two minutes and
+                    makes every brief, every question, and every accommodation
+                    specific to your child rather than generic advice.
+                  </p>
+                </div>
+                {/* Profile card mock */}
+                <div className="lg:order-2 relative">
+                  <div
+                    className="bg-white rounded-2xl p-6 relative overflow-hidden"
+                    style={{
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.06), 0 16px 40px rgba(0,0,0,0.10)",
+                      border: "1px solid #F3F4F6",
+                    }}
+                  >
+                    <div
+                      className="font-semibold uppercase mb-4"
+                      style={{ ...tinyLabelStyle, color: C.mutedLight }}
+                    >
+                      Child Profile
+                    </div>
+                    <div className="space-y-3">
+                      {[
+                        { label: "Name", value: "Maya" },
+                        { label: "Age", value: "9" },
+                        { label: "Grade", value: "4th" },
+                        { label: "State", value: "Connecticut" },
+                      ].map((field) => (
+                        <div
+                          key={field.label}
+                          className="flex justify-between items-center"
+                        >
+                          <span
+                            className="text-xs font-medium"
+                            style={{ color: "#9CA3AF" }}
+                          >
+                            {field.label}
+                          </span>
+                          <span
+                            className="text-sm font-semibold"
+                            style={{ color: C.inkLight }}
+                          >
+                            {field.value}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-5 pt-4" style={{ borderTop: "1px solid #F3F4F6" }}>
+                      <div
+                        className="font-semibold uppercase mb-2"
+                        style={{ ...tinyLabelStyle, color: C.mutedLight }}
+                      >
+                        Known Diagnoses
+                      </div>
+                      {["Dyslexia", "ADHD — Combined type"].map((d) => (
+                        <div
+                          key={d}
+                          className="flex items-center gap-2 text-[11px] mb-1.5"
+                          style={{ color: "#374151" }}
+                        >
+                          <div
+                            className="w-1 h-1 rounded-full flex-shrink-0"
+                            style={{ background: C.accent }}
+                          />
+                          {d}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </FadeIn>
+
+            {/* Step 2 */}
+            <FadeIn className="relative lg:pl-20 py-12 lg:py-16">
+              <div
+                aria-hidden
+                className="hidden lg:block absolute left-[19px] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full"
+                style={{ background: C.dotIdle }}
+              />
+              <div className="grid lg:grid-cols-[1fr_1fr] gap-10 lg:gap-16 items-center">
+                <UploadZone />
+                <div>
+                  <div
+                    className="font-semibold uppercase mb-3"
+                    style={{ ...labelStyle, color: C.mutedLight }}
+                  >
+                    Step 2
+                  </div>
+                  <h3
+                    className="font-bold mb-4 font-display"
+                    style={{
+                      color: C.inkLight,
+                      fontSize: "clamp(22px, 2.5vw, 30px)",
+                      letterSpacing: "-0.015em",
+                    }}
+                  >
+                    Upload the report
+                  </h3>
+                  <p style={{ ...bodyLargeStyle, color: C.mutedLight }}>
+                    Drop in the PDF the evaluator gave you. Any standard
+                    psychoeducational or neuropsychological format works —
+                    district reports, private evaluations, re-evaluations. Your
+                    file is processed in memory and never stored on our servers.
                   </p>
                 </div>
               </div>
             </FadeIn>
 
-            {/* ── Step 2 ── */}
+            {/* Step 3 */}
             <FadeIn className="relative lg:pl-20 py-12 lg:py-16">
               <div
                 aria-hidden
-                className="hidden lg:block absolute left-[19px] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-[#2D9B83]"
-                style={{ boxShadow: "0 0 0 4px rgba(45,155,131,0.2)" }}
+                className="hidden lg:block absolute left-[19px] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full"
+                style={{ background: C.dotIdle }}
               />
-              <div
-                aria-hidden
-                className="absolute top-0 left-0 font-display font-bold select-none pointer-events-none leading-none text-[#2D9B83]"
-                style={{
-                  fontSize: "clamp(100px, 14vw, 180px)",
-                  opacity: 0.04,
-                  lineHeight: 1,
-                  top: "-10px",
-                }}
-              >
-                02
-              </div>
-
               <div className="grid lg:grid-cols-[1fr_1fr] gap-10 lg:gap-16 items-center">
-                {/* Text (left on this step) */}
                 <div className="lg:order-1">
                   <div
-                    className="text-xs font-semibold text-[#2D9B83] uppercase mb-3"
-                    style={{ letterSpacing: "0.12em" }}
+                    className="font-semibold uppercase mb-3"
+                    style={{ ...labelStyle, color: C.mutedLight }}
                   >
-                    Step 2
+                    Step 3
                   </div>
                   <h3
-                    className="font-bold text-[#0F1117] mb-4 font-display"
+                    className="font-bold mb-4 font-display"
                     style={{
+                      color: C.inkLight,
                       fontSize: "clamp(22px, 2.5vw, 30px)",
                       letterSpacing: "-0.015em",
                     }}
                   >
-                    Clearpath reads every score
+                    Clearpath interprets every score
                   </h3>
-                  <p className="text-[#6B7280] text-lg leading-relaxed">
-                    Our AI is trained specifically on neuropsychological and
-                    psychoeducational assessments. It knows what WISC-V,
-                    WIAT-IV, BASC-3, CTOPP-2, and every other assessment
-                    battery actually means — and translates it into plain
-                    English.
+                  <p style={{ ...bodyLargeStyle, color: C.mutedLight }}>
+                    Our AI was built specifically for evaluation reports — not
+                    general questions, not generic IEP advice. It identifies
+                    every assessment battery in your child&apos;s report
+                    (WISC-V, WIAT-IV, BASC-3, CTOPP-2, and others), interprets
+                    each composite and index score, and connects the scores to
+                    what they mean in a classroom every day.
                   </p>
                 </div>
-
-                {/* Document mockup (right on this step) */}
+                {/* WISC-V card — kept as-is */}
                 <div className="lg:order-2 relative">
                   <div
                     className="bg-white rounded-2xl p-6 relative overflow-hidden"
                     style={{
-                      boxShadow:
-                        "0 2px 8px rgba(0,0,0,0.06), 0 16px 40px rgba(0,0,0,0.10)",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.06), 0 16px 40px rgba(0,0,0,0.10)",
                       border: "1px solid #F3F4F6",
                     }}
                   >
-                    {/* Teal top bar */}
                     <div
-                      className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl"
-                      style={{
-                        background:
-                          "linear-gradient(to right, #2D9B83, rgba(45,155,131,0.2))",
-                      }}
-                    />
-                    <div
-                      className="text-xs font-semibold text-[#2D9B83] uppercase mb-4"
-                      style={{ letterSpacing: "0.1em" }}
+                      className="font-semibold uppercase mb-4"
+                      style={{ ...tinyLabelStyle, color: C.mutedLight }}
                     >
                       WISC-V Score Analysis
                     </div>
                     <div className="space-y-4">
-                      {[
-                        {
-                          label: "Processing Speed Index",
-                          score: "74",
-                          pct: 34,
-                          note: "4th percentile — significant difficulty",
-                        },
-                        {
-                          label: "Working Memory Index",
-                          score: "81",
-                          pct: 48,
-                          note: "10th percentile — moderate difficulty",
-                        },
-                        {
-                          label: "Verbal Comprehension",
-                          score: "103",
-                          pct: 72,
-                          note: "58th percentile — age-appropriate",
-                        },
-                      ].map((row) => (
-                        <div key={row.label}>
+                      {scoreRows.map((r) => (
+                        <div key={r.name}>
                           <div className="flex justify-between items-center mb-1">
-                            <span className="text-xs text-[#374151] font-medium">
-                              {row.label}
-                            </span>
-                            <span className="text-sm font-bold text-[#0F1117]">
-                              {row.score}
-                            </span>
+                            <span className="text-xs font-medium" style={{ color: "#374151" }}>{r.name}</span>
+                            <span className="text-sm font-bold" style={{ color: C.inkLight }}>{r.score}</span>
                           </div>
-                          <div className="h-1.5 bg-[#F3F4F6] rounded-full overflow-hidden mb-1">
+                          <div className="h-1.5 rounded-full overflow-hidden mb-1" style={{ background: "#F3F4F6" }}>
                             <div
-                              className="h-full rounded-full transition-all"
-                              style={{
-                                width: `${row.pct}%`,
-                                background:
-                                  row.pct < 40
-                                    ? "#E8956D"
-                                    : row.pct < 55
-                                    ? "#D4A853"
-                                    : "#2D9B83",
-                              }}
+                              className="h-full rounded-full"
+                              style={{ width: `${r.width}%`, background: r.color }}
                             />
                           </div>
-                          <p className="text-[10px] text-[#9CA3AF]">
-                            {row.note}
-                          </p>
+                          <p className="text-[10px]" style={{ color: "#9CA3AF" }}>{r.note}</p>
                         </div>
                       ))}
                     </div>
-                    <div
-                      className="mt-5 pt-4"
-                      style={{ borderTop: "1px solid #F3F4F6" }}
-                    >
+                    <div className="mt-5 pt-4" style={{ borderTop: "1px solid #F3F4F6" }}>
                       <div
-                        className="text-[10px] font-semibold text-[#2D9B83] uppercase mb-2"
-                        style={{ letterSpacing: "0.1em" }}
+                        className="font-semibold uppercase mb-2"
+                        style={{ ...tinyLabelStyle, color: C.mutedLight }}
                       >
                         Services to Request
                       </div>
@@ -586,81 +939,52 @@ export default function HomePage() {
                         "Resource room support (60 min/week)",
                         "Preferential seating",
                       ].map((s) => (
-                        <div
-                          key={s}
-                          className="flex items-center gap-2 text-[11px] text-[#374151] mb-1.5"
-                        >
-                          <div className="w-1 h-1 rounded-full bg-[#2D9B83] flex-shrink-0" />
+                        <div key={s} className="flex items-center gap-2 text-[11px] mb-1.5" style={{ color: "#374151" }}>
+                          <div className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: C.accent }} />
                           {s}
                         </div>
                       ))}
                     </div>
                   </div>
-                  {/* Shadow accent */}
-                  <div
-                    aria-hidden
-                    className="absolute -bottom-3 -right-3 w-full h-full rounded-2xl -z-10"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, rgba(45,155,131,0.15), transparent)",
-                    }}
-                  />
                 </div>
               </div>
             </FadeIn>
 
-            {/* ── Step 3 ── */}
+            {/* Step 4 */}
             <FadeIn className="relative lg:pl-20 py-12 lg:py-16">
               <div
                 aria-hidden
-                className="hidden lg:block absolute left-[19px] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-[#2D9B83]"
-                style={{ boxShadow: "0 0 0 4px rgba(45,155,131,0.2)" }}
+                className="hidden lg:block absolute left-[19px] top-1/2 -translate-y-1/2 w-3 h-3 rounded-full"
+                style={{ background: C.dotIdle }}
               />
-              <div
-                aria-hidden
-                className="absolute top-0 right-0 font-display font-bold select-none pointer-events-none leading-none text-[#2D9B83]"
-                style={{
-                  fontSize: "clamp(100px, 14vw, 180px)",
-                  opacity: 0.04,
-                  lineHeight: 1,
-                  top: "-10px",
-                }}
-              >
-                03
-              </div>
-
               <div className="grid lg:grid-cols-[1fr_1fr] gap-10 lg:gap-16 items-center">
-                {/* Photo */}
-                <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.06),_0_16px_40px_rgba(0,0,0,0.08)]">
-                  <Image
-                    src={P.stepThree}
-                    alt="A parent and child together, warm and confident"
-                    fill
-                    className="object-cover"
-                  />
+                <div className="flex justify-center">
+                  <PhoneMock />
                 </div>
-                {/* Text */}
                 <div>
                   <div
-                    className="text-xs font-semibold text-[#2D9B83] uppercase mb-3"
-                    style={{ letterSpacing: "0.12em" }}
+                    className="font-semibold uppercase mb-3"
+                    style={{ ...labelStyle, color: C.mutedLight }}
                   >
-                    Step 3
+                    Step 4
                   </div>
                   <h3
-                    className="font-bold text-[#0F1117] mb-4 font-display"
+                    className="font-bold mb-4 font-display"
                     style={{
+                      color: C.inkLight,
                       fontSize: "clamp(22px, 2.5vw, 30px)",
                       letterSpacing: "-0.015em",
                     }}
                   >
-                    You get your personalized brief
+                    You walk in prepared
                   </h3>
-                  <p className="text-[#6B7280] text-lg leading-relaxed">
-                    A structured document with plain-English explanations, the
-                    questions to bring to the meeting, the services to request,
-                    and your state-specific legal rights. Ready in about 3 to 5
-                    minutes.
+                  <p style={{ ...bodyLargeStyle, color: C.mutedLight }}>
+                    You receive a structured brief written in plain English:
+                    what the report is saying, what each score means, which
+                    services your child&apos;s profile typically supports, which
+                    accommodations to request, ten questions to bring to the
+                    meeting, and your state-specific rights. Ready to read on
+                    your phone or print and bring with you.
                   </p>
                 </div>
               </div>
@@ -669,37 +993,33 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* BRIEF SECTIONS — 7 cards, elevated, interactive                   */}
-      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {/* BRIEF SECTIONS */}
       <section
         id="brief-sections"
         className="px-6 py-24 lg:py-32"
-        style={{
-          background:
-            "linear-gradient(180deg, #FAFAF8 0%, rgba(45,155,131,0.04) 100%)",
-        }}
+        style={{ background: C.lightBg }}
       >
         <div className="max-w-5xl mx-auto">
           <FadeIn className="text-center mb-16">
             <div
-              className="text-xs font-semibold text-[#2D9B83] uppercase mb-4"
-              style={{ letterSpacing: "0.12em" }}
+              className="font-semibold uppercase mb-4"
+              style={{ ...labelStyle, color: C.mutedLight }}
             >
-              What you&apos;re getting
+              What&apos;s in your brief
             </div>
             <h2
-              className="font-bold text-[#0F1117] mb-4"
+              className="font-bold mb-4"
               style={{
+                color: C.inkLight,
                 fontSize: "clamp(28px, 4vw, 42px)",
                 letterSpacing: "-0.02em",
               }}
             >
               Everything you need to walk in prepared.
             </h2>
-            <p className="text-[#6B7280] text-xl max-w-lg mx-auto">
-              Seven sections. Built around your child&apos;s specific scores —
-              not generic IEP advice.
+            <p style={{ color: C.mutedLight, fontSize: "20px", maxWidth: "32rem", margin: "0 auto" }}>
+              Seven sections built around your child&apos;s actual scores — not
+              generic advice scraped from a parent forum.
             </p>
           </FadeIn>
 
@@ -708,53 +1028,28 @@ export default function HomePage() {
               <FadeIn
                 key={card.n}
                 delay={Math.min(i % 2, 1) * 80}
-                className={
-                  i === 6
-                    ? "sm:col-span-2 sm:max-w-md sm:mx-auto w-full"
-                    : ""
-                }
+                className={i === 6 ? "sm:col-span-2 sm:max-w-md sm:mx-auto w-full" : ""}
               >
                 <div
-                  className="brief-card group relative bg-white rounded-2xl p-7 h-full cursor-default hover:-translate-y-1"
-                  style={{ borderLeft: "3px solid #2D9B83" }}
+                  className="brief-card card-hover group relative bg-white rounded-2xl p-7 h-full cursor-default"
                 >
-                  {/* Number badge with gradient */}
                   <div
                     className="w-10 h-10 rounded-xl flex items-center justify-center mb-5"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, #2D9B83 0%, #1d7a66 100%)",
-                    }}
+                    style={{ background: "#EEF2F9" }}
                   >
-                    <span className="text-white text-sm font-bold">
+                    <span className="text-sm font-bold" style={{ color: C.accent }}>
                       {card.n}
                     </span>
                   </div>
                   <h3
-                    className="font-bold text-[#0F1117] mb-2.5 leading-snug"
-                    style={{ fontSize: "17px" }}
+                    className="font-bold mb-2.5 leading-snug"
+                    style={{ color: C.inkLight, fontSize: "17px" }}
                   >
                     {card.title}
                   </h3>
-                  <p className="text-[#6B7280] text-sm leading-relaxed">
+                  <p className="text-sm leading-relaxed" style={{ color: C.mutedLight }}>
                     {card.body}
                   </p>
-
-                  {/* Hover chevron */}
-                  <div className="absolute bottom-5 right-5 w-5 h-5 text-[#2D9B83] opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-0.5 group-hover:translate-x-0">
-                    <svg
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2.5}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </div>
                 </div>
               </FadeIn>
             ))}
@@ -762,152 +1057,144 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* TRUST — dark, authoritative, editorial quote                       */}
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      <section className="noise relative bg-[#0F1117] px-6 py-24 lg:py-32 overflow-hidden">
-        {/* Subtle radial glow */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse 80% 60% at 50% 100%, rgba(45,155,131,0.08) 0%, transparent 70%)",
-          }}
-        />
-
+      {/* TRUST */}
+      <section
+        className="relative px-6 py-24 lg:py-32 overflow-hidden"
+        style={{ background: C.darkBg }}
+      >
         <div className="relative max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-14 lg:gap-20 items-center">
-
-            {/* Quote column */}
             <FadeIn direction="left">
               <div
-                className="text-xs font-semibold text-[#2D9B83] uppercase mb-8"
-                style={{ letterSpacing: "0.12em" }}
+                className="font-semibold uppercase mb-8"
+                style={{ ...labelStyle, color: C.mutedDark }}
               >
-                Built with insider knowledge
+                Built by insiders
               </div>
               <h2
                 className="font-bold text-white mb-8 leading-tight"
-                style={{
-                  fontSize: "clamp(24px, 3.5vw, 38px)",
-                  letterSpacing: "-0.02em",
-                }}
+                style={{ fontSize: "clamp(24px, 3.5vw, 38px)", letterSpacing: "-0.02em" }}
               >
-                Built with 25 years of
+                25 years inside the system.
                 <br />
-                insider knowledge.
+                Now working for you.
               </h2>
-              <p className="text-[#9CA3AF] text-lg leading-relaxed mb-10">
-                Clearpath was built in partnership with a Special Education
-                Director with 25 years of experience in Connecticut&apos;s
-                public school system. Every score interpretation and every
-                service recommendation reflects what she has seen work — and
-                what she has seen districts try to minimize.
+              <p className="mb-10" style={{ ...bodyLargeStyle, color: C.mutedDark }}>
+                Clearpath was built in close partnership with a Special
+                Education Director with 25 years of experience in Connecticut
+                public schools. Every score interpretation, every service
+                recommendation, and every meeting question reflects what she
+                has watched work — and what she has watched parents miss —
+                across thousands of IEP meetings.
               </p>
 
-              {/* Large typographic pull quote */}
-              <div className="relative">
-                {/* Big quotation mark */}
-                <div
-                  className="font-display text-[#2D9B83] leading-none mb-3 select-none"
-                  style={{ fontSize: "80px", opacity: 0.7, lineHeight: 1 }}
-                  aria-hidden
-                >
-                  &ldquo;
-                </div>
+              <div
+                style={{
+                  borderLeft: `3px solid ${C.accent}`,
+                  paddingLeft: "20px",
+                  marginBottom: "32px",
+                }}
+              >
                 <blockquote
-                  className="font-display italic text-white mb-5"
+                  className="text-white"
                   style={{
-                    fontSize: "clamp(18px, 2vw, 24px)",
-                    lineHeight: "1.55",
-                    letterSpacing: "-0.01em",
+                    fontFamily: "Inter, system-ui, sans-serif",
+                    fontSize: "18px",
+                    lineHeight: 1.7,
                   }}
                 >
                   Parents consistently do not understand their evaluation
-                  reports. I manually synthesize all of this for them at every
-                  single meeting.
+                  reports. I end up translating it for them at every single
+                  meeting. This tool does that work before they walk in the
+                  room.
                 </blockquote>
-                <div className="flex items-center gap-3 flex-wrap">
-                  <div className="w-10 h-px bg-[#2D9B83]" />
-                  <cite className="text-[#6B7280] text-sm not-italic">
-                    Special Education Director
-                  </cite>
-                  <div
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full"
-                    style={{
-                      background: "rgba(45,155,131,0.12)",
-                      border: "1px solid rgba(45,155,131,0.25)",
-                    }}
-                  >
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#2D9B83]" />
-                    <span
-                      className="text-[#2D9B83] text-xs font-medium"
-                      style={{ letterSpacing: "0.05em" }}
-                    >
-                      25 Years · Connecticut
-                    </span>
-                  </div>
-                </div>
+                <cite
+                  className="not-italic block"
+                  style={{ color: C.mutedDark, fontSize: "13px", marginTop: "14px" }}
+                >
+                  Special Education Director · 25 years experience · Connecticut public schools
+                </cite>
               </div>
 
               <Link
                 href="/signup"
-                className="inline-flex items-center gap-2 mt-8 bg-[#2D9B83] hover:bg-[#238A72] text-white font-semibold rounded-full transition-colors duration-200"
+                className="btn-press inline-flex items-center gap-2 text-white font-semibold rounded-full transition-colors"
                 style={{
+                  background: C.accent,
                   padding: "13px 26px",
                   fontSize: "15px",
-                  boxShadow: "0 0 0 1px rgba(45,155,131,0.4)",
                 }}
               >
-                Get your free brief
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2.5}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M17 8l4 4m0 0l-4 4m4-4H3"
-                  />
+                Translate my report — free
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
               </Link>
             </FadeIn>
 
-            {/* Photo */}
+            {/* Right column: warm family photo with the credential floated over it */}
             <FadeIn delay={120}>
-              <div className="relative">
-                {/* Teal accent frame behind photo */}
+              <div
+                className="relative w-full overflow-hidden rounded-2xl"
+                style={{
+                  aspectRatio: "4 / 5",
+                  maxHeight: "620px",
+                  boxShadow: "0 8px 24px rgba(0,0,0,0.3), 0 32px 72px rgba(0,0,0,0.35)",
+                }}
+              >
+                <Image
+                  src="https://images.unsplash.com/photo-1542037104857-ffbb0b9155fb?w=2400&q=90&auto=format&fit=crop"
+                  alt="A warm moment between a parent and child"
+                  fill
+                  quality={95}
+                  sizes="(min-width: 1024px) 540px, 100vw"
+                  className="object-cover"
+                  style={{ objectPosition: "center" }}
+                />
+                {/* Dark bottom gradient so the caption reads on any photo */}
                 <div
                   aria-hidden
-                  className="absolute inset-0 rounded-2xl"
+                  className="absolute inset-0"
                   style={{
-                    background: "rgba(45,155,131,0.15)",
-                    transform: "rotate(2deg) translate(10px, 10px)",
+                    background:
+                      "linear-gradient(to top, rgba(11,14,13,0.88) 0%, rgba(11,14,13,0.35) 45%, rgba(11,14,13,0) 75%)",
                   }}
                 />
-                <div
-                  className="relative rounded-2xl overflow-hidden"
-                  style={{
-                    boxShadow:
-                      "0 4px 16px rgba(0,0,0,0.3), 0 24px 64px rgba(0,0,0,0.4)",
-                  }}
-                >
-                  <div className="aspect-[3/4] relative">
-                    <Image
-                      src={P.trust}
-                      alt="A parent and child together, warm and connected"
-                      fill
-                      className="object-cover"
+
+                {/* Credential caption */}
+                <div className="absolute left-0 right-0 bottom-0 p-7 lg:p-8">
+                  <div
+                    className="inline-flex items-center gap-2 mb-3 rounded-full"
+                    style={{
+                      background: "rgba(255,255,255,0.12)",
+                      padding: "6px 12px",
+                      backdropFilter: "blur(6px)",
+                    }}
+                  >
+                    <span
+                      className="w-1.5 h-1.5 rounded-full"
+                      style={{ background: C.accent }}
                     />
-                    {/* Subtle dark overlay for better integration */}
-                    <div
-                      className="absolute inset-0"
-                      style={{ background: "rgba(15,17,23,0.15)" }}
-                    />
+                    <span
+                      className="uppercase font-semibold text-white"
+                      style={{ fontSize: "11px", letterSpacing: "0.14em" }}
+                    >
+                      Built with families like yours in mind
+                    </span>
+                  </div>
+                  <div
+                    className="text-white font-bold leading-tight"
+                    style={{ fontSize: "26px", letterSpacing: "-0.015em" }}
+                  >
+                    25 years inside the system.
+                  </div>
+                  <div
+                    className="mt-1.5"
+                    style={{ color: "rgba(255,255,255,0.82)", fontSize: "14px", lineHeight: 1.55 }}
+                  >
+                    Every score interpretation reflects what a Connecticut
+                    Special Education Director has watched work — and watched
+                    parents miss — across thousands of IEP meetings.
                   </div>
                 </div>
               </div>
@@ -916,35 +1203,13 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* FINAL CTA                                                          */}
-      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {/* FINAL CTA */}
       <section
-        className="noise relative px-6 py-28 lg:py-36 overflow-hidden"
-        style={{
-          background:
-            "radial-gradient(ellipse 120% 80% at 50% 0%, #162520 0%, #0F1117 60%)",
-        }}
+        className="relative px-6 py-28 lg:py-36 overflow-hidden"
+        style={{ background: C.darkBg }}
       >
-        {/* Teal glow at top center */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute top-0 left-1/2 -translate-x-1/2 w-px"
-          style={{
-            height: "200px",
-            background:
-              "linear-gradient(to bottom, rgba(45,155,131,0.6), transparent)",
-          }}
-        />
-
         <div className="relative max-w-3xl mx-auto text-center">
           <FadeIn>
-            <div
-              className="text-xs font-semibold text-[#2D9B83] uppercase mb-8"
-              style={{ letterSpacing: "0.12em" }}
-            >
-              You&apos;re closer than you think
-            </div>
             <h2
               className="font-extrabold font-display text-white mb-6 leading-tight"
               style={{
@@ -953,70 +1218,55 @@ export default function HomePage() {
                 lineHeight: "1.08",
               }}
             >
-              Walk into that meeting
+              Walk in knowing
               <br />
-              <span className="text-[#2D9B83]">prepared.</span>
+              what to ask for.
             </h2>
-            <p className="text-[#9CA3AF] text-xl leading-relaxed mb-10 max-w-lg mx-auto">
-              Your child&apos;s evaluation report is sitting on your kitchen
-              table. Let Clearpath tell you what it actually means.
+            <p className="mb-10 mx-auto" style={{ ...bodyLargeStyle, color: C.mutedDark, maxWidth: "32rem" }}>
+              The report is already on your kitchen table. Spend five minutes
+              turning it into the brief you wish came with it.
             </p>
 
             <Link
               href="/signup"
-              className="inline-flex items-center gap-2.5 bg-[#2D9B83] hover:bg-[#238A72] text-white font-semibold rounded-full transition-all duration-200"
+              className="btn-press inline-flex items-center gap-2.5 text-white font-semibold rounded-full transition-colors"
               style={{
+                background: C.accent,
                 padding: "16px 36px",
                 fontSize: "18px",
-                boxShadow:
-                  "0 0 0 1px rgba(45,155,131,0.5), 0 8px 32px rgba(45,155,131,0.25)",
               }}
             >
-              Get Started Free
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2.5}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M17 8l4 4m0 0l-4 4m4-4H3"
-                />
+              Translate my report — free
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </Link>
 
-            <p className="text-[#4B5563] text-sm mt-5 mb-3">
-              Free to start. No credit card required.
-            </p>
-            <p className="text-[#4B5563] text-sm">
-              Join parents who walked into their IEP meeting knowing exactly
-              what to ask for.
+            <p style={{ color: C.mutedDark, fontSize: "13px", marginTop: "24px" }}>
+              Free translation. Full meeting brief is $27, money-back if it
+              doesn&apos;t help.
             </p>
           </FadeIn>
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════════════ */}
-      {/* FOOTER                                                             */}
-      {/* ═══════════════════════════════════════════════════════════════════ */}
+      {/* FOOTER */}
       <footer
-        className="bg-[#0F1117] px-6 py-6"
-        style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}
+        className="px-6 py-6"
+        style={{ background: C.darkBg, borderTop: "1px solid rgba(255,255,255,0.06)" }}
       >
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span className="font-semibold text-xl">
-            <span className="text-[#2D9B83]">Clear</span>
+          <span className="font-bold text-xl">
+            <span style={{ color: C.accent }}>Clear</span>
             <span className="text-white">path</span>
           </span>
-          <p className="text-[#4B5563] text-sm">
+          <p style={{ color: C.mutedDark, fontSize: "13px" }}>
             &copy; {new Date().getFullYear()} Clearpath. All rights reserved.
           </p>
           <Link
             href="/privacy"
-            className="text-[#4B5563] hover:text-[#9CA3AF] text-sm transition-colors"
+            className="transition-colors"
+            style={{ color: C.mutedDark, fontSize: "13px" }}
           >
             Privacy Policy
           </Link>
