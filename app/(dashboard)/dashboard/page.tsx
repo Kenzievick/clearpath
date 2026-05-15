@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ClipboardCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getUserBriefs, getUserChildren } from "@/lib/data/briefs";
 import { PageHeader, Card, LinkButton, StatusBadge, NAVY, INK, MUTED } from "@/components/dashboard/ui";
@@ -97,6 +98,31 @@ export default async function DashboardPage() {
           </p>
           <UpgradeButton label="Upgrade — $27/month" />
         </div>
+      )}
+
+      {/* IEP Analyzer card — paid feature, only shown to subscribers */}
+      {isSubscribed && (
+        <Card className="card-hover mb-12">
+          <div className="flex items-start gap-4 flex-wrap">
+            <div
+              className="rounded-2xl flex items-center justify-center flex-shrink-0"
+              style={{ width: "52px", height: "52px", background: "#EEF2F9" }}
+            >
+              <ClipboardCheck color={NAVY} size={26} strokeWidth={1.8} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-bold mb-1" style={{ color: INK, fontSize: "17px" }}>
+                IEP Document Analyzer
+              </h3>
+              <p className="mb-4" style={{ color: MUTED, fontSize: "14px", lineHeight: 1.6 }}>
+                Have a proposed IEP? Upload it and Clearpath will analyze every
+                goal, flag vague language, and tell you what to push back on
+                before you sign.
+              </p>
+              <LinkButton href="/dashboard/analyze-iep/new">Analyze an IEP</LinkButton>
+            </div>
+          </div>
+        </Card>
       )}
 
       {children.length === 0 ? (

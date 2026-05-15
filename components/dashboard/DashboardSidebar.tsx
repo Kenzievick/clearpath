@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   Users,
   FileText,
+  ClipboardCheck,
   Upload,
   Settings,
   LogOut,
@@ -15,6 +16,7 @@ const NAV = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, exact: true },
   { label: "My Children", href: "/dashboard/children", icon: Users },
   { label: "My Briefs", href: "/dashboard/briefs", icon: FileText },
+  { label: "IEP Analyzer", href: "/dashboard/analyze-iep", icon: ClipboardCheck },
   { label: "Upload Report", href: "/dashboard/upload", icon: Upload },
   { label: "Settings", href: "/dashboard/settings", icon: Settings },
 ];

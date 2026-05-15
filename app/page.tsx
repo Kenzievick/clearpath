@@ -1,7 +1,16 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Fragment } from "react";
-import { Shield, Lock, EyeOff, Trash2, Award } from "lucide-react";
+import {
+  Shield,
+  Lock,
+  EyeOff,
+  Trash2,
+  Award,
+  FileText,
+  ClipboardCheck,
+  ChevronDown,
+} from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { FadeIn } from "@/components/FadeIn";
 
@@ -29,7 +38,7 @@ const stats = [
   { value: "8.2M+", label: "ACTIVE IEPs IN THE US" },
   { value: "15–30", label: "PAGES IN THE AVERAGE REPORT" },
   { value: "~5 min", label: "TO YOUR BRIEF" },
-  { value: "25 years", label: "SPECIAL ED DIRECTOR EXPERTISE" },
+  { value: "35 years", label: "SPECIAL ED DIRECTOR EXPERTISE" },
 ];
 
 const briefCards = [
@@ -74,21 +83,21 @@ const scoreRows = [
   {
     name: "Processing Speed Index",
     score: "74",
-    width: 30,
+    width: 4, // 4th percentile — bar fill matches the percentile
     color: C.scoreLow,
     note: "4th percentile · Significant difficulty — affects timed tasks and written output",
   },
   {
     name: "Working Memory Index",
     score: "81",
-    width: 45,
+    width: 10, // 10th percentile
     color: C.scoreMid,
     note: "10th percentile · Moderate difficulty — impacts multi-step instructions",
   },
   {
     name: "Verbal Comprehension Index",
     score: "103",
-    width: 68,
+    width: 58, // 58th percentile
     color: C.scoreOk,
     note: "58th percentile · Age-appropriate · Relative strength to leverage",
   },
@@ -373,6 +382,210 @@ export default function HomePage() {
     <div className="bg-white overflow-x-hidden">
       <Navbar />
 
+      {/* ─── INTRO — full-viewport split introduction ─────────────────────── */}
+      <section
+        className="relative flex flex-col md:flex-row"
+        style={{ background: C.lightBg, minHeight: "100vh" }}
+      >
+        {/* Left: text content */}
+        <div className="order-2 md:order-1 md:w-1/2 flex flex-col justify-center py-8 px-6 md:py-16 md:pl-20 md:pr-10">
+          {/* 1 — Wordmark */}
+          <FadeIn delay={0}>
+            <div
+              className="font-bold tracking-tight"
+              style={{ fontSize: "28px" }}
+            >
+              <span style={{ color: C.accent }}>Clear</span>
+              <span style={{ color: C.inkLight }}>path</span>
+            </div>
+          </FadeIn>
+
+          {/* 2 — Category label */}
+          <FadeIn delay={100}>
+            <span
+              className="inline-flex items-center rounded-full font-medium uppercase mt-6"
+              style={{
+                border: `1px solid ${C.accent}`,
+                color: C.accent,
+                background: "#FFFFFF",
+                padding: "6px 14px",
+                fontSize: "12px",
+                letterSpacing: "0.08em",
+              }}
+            >
+              Special Education Support
+            </span>
+          </FadeIn>
+
+          {/* 3 — Headline */}
+          <FadeIn delay={200}>
+            <h1 className="mt-6">
+              <span
+                className="block"
+                style={{
+                  fontFamily: "Inter, system-ui, sans-serif",
+                  fontWeight: 700,
+                  fontSize: "clamp(32px, 4.4vw, 48px)",
+                  color: C.inkLight,
+                  lineHeight: 1.1,
+                  letterSpacing: "-0.02em",
+                }}
+              >
+                Everything parents need
+              </span>
+              <span
+                className="block"
+                style={{
+                  fontFamily: "Inter, system-ui, sans-serif",
+                  fontWeight: 800,
+                  fontSize: "clamp(38px, 5.2vw, 56px)",
+                  color: C.accent,
+                  lineHeight: 1.08,
+                  letterSpacing: "-0.025em",
+                }}
+              >
+                to fight for their child.
+              </span>
+            </h1>
+          </FadeIn>
+
+          {/* 4 — Product description */}
+          <FadeIn delay={300}>
+            <p
+              className="mt-6"
+              style={{
+                fontFamily: "Inter, system-ui, sans-serif",
+                fontSize: "18px",
+                color: C.mutedLight,
+                lineHeight: 1.7,
+                maxWidth: "480px",
+              }}
+            >
+              Clearpath helps parents and caregivers of children with
+              disabilities understand and manage every part of the special
+              education process — from educational evaluations and IEP meetings
+              to services, accommodations, and legal rights. In plain English.
+              In minutes.
+            </p>
+          </FadeIn>
+
+          {/* 5 — Capability chips */}
+          <FadeIn delay={400}>
+            <div className="flex flex-wrap gap-2 mt-6">
+              {[
+                { Icon: FileText, label: "Evaluation Reports" },
+                { Icon: ClipboardCheck, label: "IEP Documents" },
+                { Icon: Shield, label: "Your Legal Rights" },
+              ].map(({ Icon, label }) => (
+                <span
+                  key={label}
+                  className="inline-flex items-center gap-1.5 rounded-full font-medium"
+                  style={{
+                    background: "#EEF2F9",
+                    color: C.accent,
+                    padding: "8px 16px",
+                    fontSize: "13px",
+                  }}
+                >
+                  <Icon size={14} strokeWidth={2} />
+                  {label}
+                </span>
+              ))}
+            </div>
+          </FadeIn>
+
+          {/* 6 — CTA buttons */}
+          <FadeIn delay={500}>
+            <div className="flex flex-col sm:flex-row gap-3 mt-7">
+              <Link
+                href="/signup"
+                className="btn-press inline-flex items-center justify-center rounded-full font-semibold text-white transition-colors"
+                style={{
+                  background: C.accent,
+                  padding: "14px 28px",
+                  fontSize: "16px",
+                }}
+              >
+                Get Started Free
+              </Link>
+              <a
+                href="#how-it-works"
+                className="inline-flex items-center justify-center rounded-full font-semibold transition-colors hover:bg-[#EEF2F9]"
+                style={{
+                  background: "transparent",
+                  border: `1px solid ${C.accent}`,
+                  color: C.accent,
+                  padding: "14px 28px",
+                  fontSize: "16px",
+                }}
+              >
+                See how it works
+              </a>
+            </div>
+          </FadeIn>
+
+          {/* 7 — Social proof */}
+          <FadeIn delay={600}>
+            <p
+              className="mt-6 italic"
+              style={{ fontSize: "13px", color: "#9CA3AF" }}
+            >
+              Trusted by families navigating IEP meetings across Connecticut and
+              beyond.
+            </p>
+          </FadeIn>
+
+          {/* 8 — Scroll indicator */}
+          <div className="mt-10" aria-hidden>
+            <ChevronDown
+              size={20}
+              style={{ color: "#9CA3AF", animation: "introChevron 2s ease-in-out infinite" }}
+            />
+          </div>
+        </div>
+
+        {/* Vertical divider — desktop only */}
+        <div
+          aria-hidden
+          className="hidden md:block"
+          style={{ width: "1px", background: C.rule }}
+        />
+
+        {/* Right: photograph */}
+        <FadeIn
+          direction="none"
+          duration={800}
+          delay={200}
+          className="order-1 md:order-2 relative w-full h-[280px] md:h-auto md:w-1/2 overflow-hidden rounded-none md:rounded-l-3xl"
+        >
+          <Image
+            src="https://images.unsplash.com/photo-1588072432836-e10032774350?w=1600&q=90&auto=format&fit=crop"
+            alt="A parent reviewing documents with their child, preparing for an IEP meeting"
+            fill
+            quality={90}
+            priority
+            className="object-cover"
+            style={{ objectPosition: "center" }}
+          />
+          <div
+            aria-hidden
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "linear-gradient(to top, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0) 40%)",
+            }}
+          />
+        </FadeIn>
+
+        {/* Scoped keyframe for the scroll chevron */}
+        <style>{`
+          @keyframes introChevron {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(6px); }
+          }
+        `}</style>
+      </section>
+
       {/* HERO */}
       <section
         className="relative flex items-center overflow-hidden"
@@ -423,8 +636,8 @@ export default function HomePage() {
               >
                 <Award className="w-4 h-4 flex-shrink-0" style={{ color: C.accent }} strokeWidth={2} />
                 <span>
-                  Built with a 25-year Special Education Director who has run
-                  thousands of IEP meetings
+                  Built with a Special Education Director with 35 years of
+                  experience running thousands of IEP meetings
                 </span>
               </div>
 
@@ -693,7 +906,7 @@ export default function HomePage() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="bg-white px-6 py-24 lg:py-32 overflow-hidden">
+      <section id="how-it-works" className="bg-white px-6 py-24 lg:py-32 overflow-hidden">
         <div className="max-w-5xl mx-auto">
           <FadeIn className="text-center mb-20">
             <div
@@ -1075,13 +1288,13 @@ export default function HomePage() {
                 className="font-bold text-white mb-8 leading-tight"
                 style={{ fontSize: "clamp(24px, 3.5vw, 38px)", letterSpacing: "-0.02em" }}
               >
-                25 years inside the system.
+                35 years inside the system.
                 <br />
                 Now working for you.
               </h2>
               <p className="mb-10" style={{ ...bodyLargeStyle, color: C.mutedDark }}>
                 Clearpath was built in close partnership with a Special
-                Education Director with 25 years of experience in Connecticut
+                Education Director with 35 years of experience in Connecticut
                 public schools. Every score interpretation, every service
                 recommendation, and every meeting question reflects what she
                 has watched work — and what she has watched parents miss —
@@ -1112,7 +1325,7 @@ export default function HomePage() {
                   className="not-italic block"
                   style={{ color: C.mutedDark, fontSize: "13px", marginTop: "14px" }}
                 >
-                  Special Education Director · 25 years experience · Connecticut public schools
+                  Special Education Director · 35 years experience · Connecticut public schools
                 </cite>
               </div>
 
@@ -1186,7 +1399,7 @@ export default function HomePage() {
                     className="text-white font-bold leading-tight"
                     style={{ fontSize: "26px", letterSpacing: "-0.015em" }}
                   >
-                    25 years inside the system.
+                    35 years inside the system.
                   </div>
                   <div
                     className="mt-1.5"

@@ -258,7 +258,7 @@ export default function QuizClient() {
         <div className="max-w-3xl mx-auto mt-10 grid sm:grid-cols-3 gap-3 sm:gap-6">
           {[
             "Free · No signup required",
-            "Built with a 25-year Special Education Director",
+            "Built with a Special Education Director with 35 years of experience",
             "Used by parents in Connecticut and beyond",
           ].map((t) => (
             <div
