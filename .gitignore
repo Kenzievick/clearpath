@@ -37,4 +37,6 @@ next-env.d.ts
 
 # env backups
 .env*.local.bak
+.env*.local.save
+.env*.save
 *.bak
