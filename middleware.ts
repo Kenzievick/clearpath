@@ -4,7 +4,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 // Routes that must never be touched by auth handling. Stripe webhooks arrive
 // with no user session; /api/analyze-iep handles its own auth (and runs a long
 // pipeline) so it should pass straight through too.
-const PUBLIC_ROUTES = ['/api/webhooks/stripe', '/api/analyze-iep']
+const PUBLIC_ROUTES = ['/api/webhooks/stripe', '/api/analyze-iep', '/privacy']
 
 export async function middleware(request: NextRequest) {
   if (PUBLIC_ROUTES.some((p) => request.nextUrl.pathname.startsWith(p))) {

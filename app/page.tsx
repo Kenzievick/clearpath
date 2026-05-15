@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { FadeIn } from "@/components/FadeIn";
+import AccountDeletedToast from "@/components/AccountDeletedToast";
 
 /* ─── Palette ────────────────────────────────────────────────────────────── */
 const C = {
@@ -377,9 +378,15 @@ function PhoneMock() {
 }
 
 /* ─── Page ───────────────────────────────────────────────────────────────── */
-export default function HomePage() {
+export default function HomePage({
+  searchParams,
+}: {
+  searchParams?: { deleted?: string };
+}) {
+  const accountDeleted = searchParams?.deleted === "true";
   return (
     <div className="bg-white overflow-x-hidden">
+      {accountDeleted && <AccountDeletedToast />}
       <Navbar />
 
       {/* ─── INTRO — full-viewport split introduction ─────────────────────── */}

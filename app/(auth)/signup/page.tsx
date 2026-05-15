@@ -164,8 +164,14 @@ export default function SignupPage() {
           </form>
 
           <p className="text-xs text-[#9CA3AF] text-center mt-5 leading-relaxed">
-            By creating an account you agree to our Terms of Service and Privacy
-            Policy.
+            By creating an account you agree to our Terms of Service and{" "}
+            <Link
+              href="/privacy"
+              className="text-[#1B3A6B] hover:underline"
+            >
+              Privacy Policy
+            </Link>
+            .
           </p>
 
           <p className="text-center text-sm text-[#6B7280] mt-5">
