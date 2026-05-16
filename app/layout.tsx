@@ -7,9 +7,9 @@ export const metadata: Metadata = {
   description:
     "Clearpath reads your child's comprehensive educational evaluation report and gives you a clear, jargon-free brief, the right questions to ask, and the services worth requesting — before you walk into the IEP meeting.",
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/favicon.ico",
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
   },
 };
 
