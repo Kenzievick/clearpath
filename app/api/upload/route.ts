@@ -4,6 +4,8 @@ import { extractTextFromPDF } from "@/lib/pdf/processor";
 import { classifyReport } from "@/lib/ai/classify";
 import { interpretScores } from "@/lib/ai/interpret";
 import { generateFullBrief } from "@/lib/ai/generateBrief";
+import { sendBriefReadyEmail } from "@/lib/email/send";
+import { trackServerEvent } from "@/lib/analytics/posthog";
 
 export const maxDuration = 300;
 export const dynamic = "force-dynamic";
@@ -64,6 +66,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Failed to initialize brief" }, { status: 500 });
     }
 
+    await trackServerEvent({
+      userId: user.id,
+      event: "upload_started",
+      properties: { fileSize: file.size, childId },
+    });
+
     const arrayBuffer = await file.arrayBuffer();
     const pdfBuffer = Buffer.from(arrayBuffer);
 
@@ -115,6 +123,39 @@ export async function POST(request: NextRequest) {
           completed_at: new Date().toISOString(),
         })
         .eq("id", brief.id);
+
+      await trackServerEvent({
+        userId: user.id,
+        event: "brief_generated",
+        properties: {
+          briefId: brief.id,
+          childId,
+          batteriesFound: classification.batteriesFound,
+          detectedState: classification.stateCode,
+        },
+      });
+
+      // Best-effort: send the brief-ready email. Look up subscription
+      // status from `profiles`; the recipient email comes from the auth
+      // user. Failures are swallowed so the brief is still returned.
+      try {
+        const { data: profileRow } = await supabase
+          .from("profiles")
+          .select("subscription_status")
+          .eq("id", user.id)
+          .single();
+
+        if (user.email) {
+          await sendBriefReadyEmail({
+            to: user.email,
+            childName: child.first_name,
+            briefId: brief.id,
+            isSubscribed: profileRow?.subscription_status === "active",
+          });
+        }
+      } catch (emailLookupError) {
+        console.error("brief-ready email lookup failed:", emailLookupError);
+      }
 
       return NextResponse.json({
         success: true,

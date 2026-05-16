@@ -39,6 +39,9 @@ export default function SignupPage() {
       return;
     }
 
+    // Fire-and-forget welcome email — never block the redirect.
+    fetch("/api/auth/welcome", { method: "POST" }).catch(() => {});
+
     router.push("/dashboard");
     router.refresh();
   }

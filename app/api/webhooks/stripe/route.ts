@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { stripe } from "@/lib/stripe/client";
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { sendSubscriptionConfirmedEmail } from "@/lib/email/send";
+import { trackServerEvent } from "@/lib/analytics/posthog";
 
 export const dynamic = "force-dynamic";
 
@@ -55,6 +57,31 @@ export async function POST(request: NextRequest) {
               subscribed_at: new Date().toISOString(),
             })
             .eq("id", userId);
+
+          await trackServerEvent({
+            userId,
+            event: "subscription_started",
+            properties: { briefId: session.metadata?.brief_id },
+          });
+
+          // Best-effort welcome-to-paid email. Prefer Stripe's collected
+          // billing email; fall back to the Supabase auth record.
+          try {
+            let toEmail = session.customer_details?.email ?? null;
+            if (!toEmail) {
+              const { data: authData } =
+                await supabaseAdmin.auth.admin.getUserById(userId);
+              toEmail = authData?.user?.email ?? null;
+            }
+            if (toEmail) {
+              await sendSubscriptionConfirmedEmail({ to: toEmail });
+            }
+          } catch (emailError) {
+            console.error(
+              "subscription confirmed email failed:",
+              emailError
+            );
+          }
         }
         break;
       }

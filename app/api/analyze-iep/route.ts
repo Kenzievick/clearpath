@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { extractTextFromPDF } from "@/lib/pdf/processor";
 import { analyzeIEPDocument } from "@/lib/ai/analyzeIEP";
+import { trackServerEvent } from "@/lib/analytics/posthog";
 
 export const maxDuration = 300;
 export const dynamic = "force-dynamic";
@@ -139,6 +140,15 @@ export async function POST(request: NextRequest) {
           completed_at: new Date().toISOString(),
         })
         .eq("id", analysis.id);
+
+      await trackServerEvent({
+        userId: user.id,
+        event: "iep_analyzed",
+        properties: {
+          analysisId: analysis.id,
+          usedBriefContext: useBriefContext,
+        },
+      });
 
       return NextResponse.json({ success: true, analysisId: analysis.id });
     } catch (error) {
